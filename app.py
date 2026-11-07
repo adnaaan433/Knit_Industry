@@ -693,11 +693,20 @@ else:
         # Add Machine Row Form with Live Formula Preview
         with st.container(border=True):
             st.markdown("#### ➕ Add Machine to Profile")
+            available_brands = db.get_all_brands()
+            brand_dropdown_opts = available_brands + ["➕ Add New Brand..."]
+
             fc1, fc2, fc3, fc4, fc5 = st.columns([1.5, 1.6, 1.1, 1, 1])
             with fc1:
                 in_fab = st.selectbox("Fabrication *", options=db.FABRICATION_TYPES, key=f"mp_fab_{industry_id}")
             with fc2:
-                in_brand_choice = st.selectbox("Brand *", options=COMMON_BRANDS, key=f"mp_brand_sel_{industry_id}")
+                in_brand_choice = st.selectbox(
+                    "Brand (Select or type new) *",
+                    options=brand_dropdown_opts,
+                    accept_new_options=True,
+                    help="Select an existing brand, type a new brand name directly here and press Enter, or choose '➕ Add New Brand...' to type below.",
+                    key=f"mp_brand_sel_{industry_id}",
+                )
             with fc3:
                 in_qty = st.number_input("Total Machine *", min_value=1, max_value=500, value=1, step=1, key=f"mp_qty_{industry_id}")
             with fc4:
@@ -707,11 +716,17 @@ else:
 
             opt_c1, opt_c2, opt_c3, opt_c4 = st.columns([1.5, 1.5, 1.5, 1.5])
             with opt_c1:
-                if in_brand_choice == "Other / Custom":
-                    final_brand = st.text_input("Enter Custom Brand Name *", key=f"mp_custom_brand_{industry_id}")
+                custom_brand_input = st.text_input(
+                    "Or Enter New Brand Name",
+                    placeholder="Type new brand name here...",
+                    key=f"mp_custom_brand_{industry_id}",
+                )
+                if custom_brand_input.strip():
+                    final_brand = custom_brand_input.strip()
+                elif in_brand_choice and in_brand_choice != "➕ Add New Brand...":
+                    final_brand = in_brand_choice.strip()
                 else:
-                    final_brand = in_brand_choice
-                    st.text_input("Selected Brand", value=final_brand, disabled=True, key=f"mp_brand_disp_{industry_id}")
+                    final_brand = ""
             with opt_c2:
                 in_needle_spec = st.text_input("Needle Spec / Part No. (Optional)", placeholder="e.g. Voelker / GB", key=f"mp_nspec_{industry_id}")
             with opt_c3:

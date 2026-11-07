@@ -693,3 +693,35 @@ def delete_machine(machine_id):
     conn.execute("DELETE FROM machine_profiles WHERE id = ?", (machine_id,))
     conn.commit()
     conn.close()
+
+
+DEFAULT_BRANDS = [
+    "Mayer & Cie",
+    "Orizio",
+    "Pai Long",
+    "Fukuhara",
+    "HaanTex",
+    "Hangxing",
+    "Santo",
+    "Jung Long",
+    "Terrot",
+    "Jiunn Long",
+    "Santoni",
+    "Wellknit",
+]
+
+
+def get_all_brands():
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT DISTINCT brand FROM machine_profiles WHERE brand IS NOT NULL AND TRIM(brand) != ''"
+    ).fetchall()
+    conn.close()
+    seen = set()
+    brands = []
+    for b in DEFAULT_BRANDS + [r["brand"].strip() for r in rows]:
+        if b and b.lower() not in seen:
+            seen.add(b.lower())
+            brands.append(b)
+    return brands
+
