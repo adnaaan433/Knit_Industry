@@ -601,6 +601,147 @@ def render_adury_profile_html() -> str:
     )
 
 
+TOSRIFA_CIRCULAR_ROWS = [
+    # (sl, mc_no, dia, gauge, feeder, mc_type, type_span, brand, model, origin, cap_kg)
+    (1, 6, 30, "24/28", 90, "SINGLE JERSEY", 10, "Keum Yong", "KM-3WVX", "Korea", "250"),
+    (2, 7, 30, "24/32", 90, None, 0, "Keum Yong", "KLM-72AV", "Korea", "250"),
+    (3, 34, 34, "28", 102, None, 0, "Keum Yong", "KM-3WVX", "Korea", "300"),
+    (4, 35, 34, "28", 102, None, 0, "Keum Yong", "KM-3WVX", "Korea", "300"),
+    (5, 9, 34, "24/28", 102, None, 0, "Keum Yong", "KM-3WVX", "Korea", "300"),
+    (6, 8, 30, "24/32", 90, None, 0, "Keum Yong", "KM-3WVX", "Korea", "250"),
+    (7, 44, 34, "24/28", 108, None, 0, "Mayer & Cie", "RELANIT 3.2-II", "Germany", "250"),
+    (8, 33, 34, "24/28", 108, None, 0, "Mayer & Cie", "RELANIT 3.2-II", "Germany", "250"),
+    (9, 11, 38, "24", 123, None, 0, "Mayer & Cie", "RELANIT 3.2-II", "Germany", "350"),
+    (10, 22, 36, "24", 114, None, 0, "Mayer & Cie", "RELANIT 3.2-II", "Germany", "340"),
+    (11, 10, 30, "20/24", 96, "Fleece, S/Jersey", 8, "Mayer & Cie", "S4-3.2", "Germany", "250"),
+    (12, 27, 30, "20/24/12", 96, None, 0, "Lisky", "4-Tube-2014", "Taiwan", "260"),
+    (13, 29, 30, "20/24/12", 96, None, 0, "Lisky", "4-Tube-2014", "Taiwan", "260"),
+    (14, 31, 30, "20/24/12", 96, None, 0, "Lisky", "4-Tube-2014", "Taiwan", "260"),
+    (15, 19, 30, "20/24/12", 96, None, 0, "Lisky", "Version-Tube-2016", "Taiwan", "280"),
+    (16, 20, 30, "20/24/12", 96, None, 0, "Lisky", "Version-Tube-2016", "Taiwan", "280"),
+    (17, 40, 30, "20/24", 90, None, 0, "Point", "ZD-S", "China", "280"),
+    (18, 26, 30, "20/28", 90, None, 0, "Point", "ZD-S", "China", "280"),
+    (19, 32, 30, "20/12", 96, "Fleece", 12, "Lisky", "4-Tube-2014", "Taiwan", "280"),
+    (20, 21, 30, "20/12", 96, None, 0, "Lisky", "Version-Tube-2016", "Taiwan", "280"),
+    (21, 30, 30, "20/12", 96, None, 0, "Lisky", "4-Tube-2014", "Taiwan", "280"),
+    (22, 28, 30, "20", 96, None, 0, "Lisky", "4-Tube-2014", "Taiwan", ""),
+    (23, 25, 30, "20", 90, None, 0, "Point", "ZD-S", "China", "280"),
+    (24, 43, 30, "20", 90, None, 0, "Point", "ZD-S", "China", ""),
+    (25, 42, 30, "20", 90, None, 0, "Point", "ZD-S", "China", ""),
+    (26, 41, 30, "20", 90, None, 0, "Point", "ZD-S", "China", "280"),
+    (27, 39, 30, "20", 90, None, 0, "Point", "ZD-S", "China", "280"),
+    (28, 38, 30, "20", 90, None, 0, "Point", "ZD-S", "China", "280"),
+    (29, 37, 30, "20", 90, None, 0, "Point", "ZD-S", "China", "280"),
+    (30, 36, 30, "20", 90, None, 0, "Point", "ZD-S", "China", "280"),
+    (31, 24, 42, "18", 84, "Rib/Spacer", 6, "Lisky", "DT/84 A-4", "Taiwan", "300"),
+    (32, 23, 42, "18/14", 84, None, 0, "Lisky", "DT/84 A-4", "Taiwan", "300"),
+    (33, 1, 42, "18", 84, None, 0, "Lisky", "DT/84 A-4", "Taiwan", "300"),
+    (34, 2, 42, "18", 84, None, 0, "Lisky", "DT/84 A-4", "Taiwan", ""),
+    (35, 12, 42, "18", 84, None, 0, "Lisky", "DT/84 A-4", "Taiwan", "300"),
+    (36, 13, 42, "18", 84, None, 0, "Lisky", "DT/84 A-4", "Taiwan", "300"),
+    (37, 15, 34, "18", 72, "Rib", 3, "Mayer & Cie", "D4-2.2", "Germany", "200"),
+    (38, 17, 32, "18", 68, None, 0, "Mayer & Cie", "D4-2.2", "Germany", ""),
+    (39, 18, 30, "18", 62, None, 0, "Mayer & Cie", "F4-2.0", "Germany", "220"),
+    (40, 4, 34, "24", 82, "Interlock", 4, "Keum Yong", "KLM-72AV", "Korea", ""),
+    (41, 5, 34, "24/28", 82, None, 0, "Keum Yong", "KLM-72AV", "Korea", "220"),
+    (42, 45, 34, "24/28", 82, None, 0, "Keum Yong", "KLM-72AV", "Korea", "220"),
+    (43, 3, 30, "24/28", 72, None, 0, "Keum Yong", "KLM-72AV", "Korea", "210"),
+    (44, 14, 34, "18/24", 72, "Rib/Interlock", 2, "Mayer & Cie", "D4-2.2", "Germany", "200"),
+    (45, 16, 32, "18/24", 68, None, 0, "Mayer & Cie", "D4-2.2", "Germany", "200"),
+]
+
+TOSRIFA_FLAT_ROWS = [
+    ("Shima Seiki", "SFF 152", '60"', "Japan", 4, "Double Head"),
+    ("Matsuya", "M100", '40"', "China", 8, "Single Head"),
+    ("Matsuya", "M 172 SJ", '68"', "China", 8, "Double Head"),
+    ("Matsuya", "MC 203 SJ", '80"', "China", 2, "Double Head"),
+    ("Matsuya", "Super-NJ 212", '48"', "China", 2, "Duel System"),
+]
+
+
+def render_tosrifa_profile_html() -> str:
+    """Render Tosrifa Industries Ltd. Circular & Flat Bed Knitting Machine Profile table."""
+    circ_trs = [
+        "<tr>"
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:7%;">SL No</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:8%;">M/C no</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:8%;">Mc Dia</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:10%;">Gauge</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:9%;">No.of Feeder</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:13%;">Mc Type</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:13%;">Mc Brand</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:14%;">Model</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:9%;">Origin</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:9%;">Capacity /kg</th>'
+        "</tr>"
+    ]
+    for sl, mc_no, dia, gg, feeder, mtype, t_span, brand, model, origin, cap in TOSRIFA_CIRCULAR_ROWS:
+        is_shaded = cap == ""
+        cell_bg = "background-color:#e2e8f0;" if is_shaded else ""
+        tr = ["<tr>"]
+        tr.append(f'<td class="total-col" style="{cell_bg}"><strong>{sl}</strong></td>')
+        tr.append(f'<td class="total-col" style="{cell_bg}"><strong>{mc_no}</strong></td>')
+        tr.append(f'<td class="total-col" style="{cell_bg}"><strong>{dia}</strong></td>')
+        tr.append(f'<td class="total-col" style="{cell_bg}"><strong>{html.escape(gg)}</strong></td>')
+        tr.append(f'<td class="total-col" style="{cell_bg}"><strong>{feeder}</strong></td>')
+        if t_span > 0:
+            tr.append(
+                f'<td class="total-col" rowspan="{t_span}" style="background-color:#ffffff;font-weight:800;">{html.escape(mtype)}</td>'
+            )
+        tr.append(f'<td class="total-col" style="{cell_bg}"><strong>{html.escape(brand)}</strong></td>')
+        tr.append(f'<td class="total-col" style="{cell_bg}"><strong>{html.escape(model)}</strong></td>')
+        tr.append(f'<td class="total-col" style="{cell_bg}"><strong>{html.escape(origin)}</strong></td>')
+        tr.append(f'<td class="total-col" style="{cell_bg}"><strong>{html.escape(cap)}</strong></td>')
+        tr.append("</tr>")
+        circ_trs.append("".join(tr))
+
+    circ_trs.append(
+        "<tr>"
+        '<td colspan="9" style="background-color:#ffffff;color:#0f172a;font-weight:800;text-align:left;padding:6px 16px;border:1.5px solid #0f172a;">Flat Bed Knitting Machine:</td>'
+        '<td class="total-col" style="background-color:#e2e8f0;color:#0f172a;font-weight:800;border:1.5px solid #0f172a;">10480</td>'
+        "</tr>"
+    )
+
+    flat_trs = [
+        "<tr>"
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:19%;">M/c Brand</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:19%;">Model No.</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:10%;">Bed</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:15%;">Origin</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:13%;">No.of Qty</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:15%;">No of Head Per M/C</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:9%;"></th>'
+        "</tr>"
+    ]
+    for idx, (f_brand, f_model, f_bed, f_orig, f_qty, f_head) in enumerate(TOSRIFA_FLAT_ROWS):
+        tr = [
+            "<tr>",
+            f'<td class="total-col"><strong>{html.escape(f_brand)}</strong></td>',
+            f'<td class="total-col"><strong>{html.escape(f_model)}</strong></td>',
+            f'<td class="total-col"><strong>{html.escape(f_bed)}</strong></td>',
+            f'<td class="total-col"><strong>{html.escape(f_orig)}</strong></td>',
+            f'<td class="total-col"><strong>{f_qty}</strong></td>',
+            f'<td class="total-col"><strong>{html.escape(f_head)}</strong></td>',
+        ]
+        if idx == 0:
+            tr.append(
+                f'<td class="total-col" rowspan="{len(TOSRIFA_FLAT_ROWS)}" style="font-weight:800;">10000 set/day</td>'
+            )
+        tr.append("</tr>")
+        flat_trs.append("".join(tr))
+
+    return (
+        f'<div class="mp-sheet-container" style="max-width:980px;margin-bottom:1rem;">'
+        f'<table class="mp-sheet-table" style="font-size:0.84rem;">'
+        f'<tbody>{"".join(circ_trs)}</tbody>'
+        f"</table>"
+        f'<table class="mp-sheet-table" style="font-size:0.84rem;border-top:none;">'
+        f'<tbody>{"".join(flat_trs)}</tbody>'
+        f"</table>"
+        f"</div>"
+    )
+
+
 # Session state navigation
 if "current_view" not in st.session_state:
     st.session_state.current_view = "directory"
@@ -964,9 +1105,19 @@ else:
         is_masco = "masco" in industry["name"].lower()
         is_renaissance = "renaissance" in industry["name"].lower()
         is_adury = "adury" in industry["name"].lower()
+        is_tosrifa = "tosrifa" in industry["name"].lower()
         fakir_data = db.get_fakir_knitting_data() if is_fakir else None
 
-        if is_adury:
+        if is_tosrifa:
+            mk1, mk2, mk3, mk4 = st.columns(4)
+            mk1.metric("Grand Total Machines", "69")
+            mk2.metric("Circular Knitting Machines", "45 (10,480 kg/day)")
+            mk3.metric("Flat Bed Knitting Machines", "24 (10,000 set/day)")
+            mk4.metric("Machine Brands", "6 (Keum Yong, Mayer & Cie, Lisky, Point, Shima Seiki, Matsuya)")
+
+            st.markdown(render_tosrifa_profile_html(), unsafe_allow_html=True)
+
+        elif is_adury:
             mk1, mk2, mk3, mk4 = st.columns(4)
             mk1.metric("Grand Total Machines", "105")
             mk2.metric("Circular Knit Machines", "63")

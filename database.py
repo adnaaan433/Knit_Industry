@@ -211,6 +211,9 @@ def init_db():
     # Seed Adury Knit Composite machine profile if empty
     seed_adury_machines(conn)
 
+    # Seed Tosrifa Industries Ltd machine profile if empty
+    seed_tosrifa_machines(conn)
+
     conn.close()
 
 
@@ -852,6 +855,41 @@ def seed_adury_machines(conn):
         ("Collar & Cuff (Flat Knit)", 60, 14, "45\"–80\" x 14G", "Semi Jacquard & Jacquard", 42),
     ]
     for fab, dia, gauge, lbl, brand, qty in adury_rows:
+        cur.execute(
+            """
+            INSERT INTO machine_profiles (
+                industry_id, fabrication, dia, gauge, dia_gauge_label, brand, quantity,
+                needles_per_machine, sinkers_per_machine
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+            """,
+            (ind_id, fab, dia, gauge, lbl, brand, qty),
+        )
+    conn.commit()
+
+
+def seed_tosrifa_machines(conn):
+    """Seed Tosrifa Industries Ltd knitting machines (45 Circular + 24 Flat Bed = 69) into machine_profiles."""
+    cur = conn.cursor()
+    row = cur.execute("SELECT id FROM industries WHERE name LIKE '%Tosrifa%' LIMIT 1").fetchone()
+    if not row:
+        return
+    ind_id = row["id"]
+
+    cnt = cur.execute("SELECT COUNT(*) as c FROM machine_profiles WHERE industry_id = ?", (ind_id,)).fetchone()["c"]
+    if cnt > 0:
+        return
+
+    tosrifa_rows = [
+        ("SINGLE JERSEY", 34, 24, "30\"–38\"", "Keum Yong / Mayer & Cie", 10),
+        ("Fleece, S/Jersey", 30, 20, "30\" x 20/24/12", "Mayer & Cie / Lisky / Point", 8),
+        ("Fleece", 30, 20, "30\" x 20/12", "Lisky / Point", 12),
+        ("Rib/Spacer", 42, 18, "42\" x 18G", "Lisky", 6),
+        ("Rib", 32, 18, "30\"–34\" x 18G", "Mayer & Cie", 3),
+        ("Interlock", 34, 24, "30\"–34\" x 24/28G", "Keum Yong", 4),
+        ("Rib/Interlock", 34, 18, "32\"–34\" x 18/24G", "Mayer & Cie", 2),
+        ("Flat Bed Knitting Machine", 60, 14, "40\"–80\" Bed", "Shima Seiki / Matsuya", 24),
+    ]
+    for fab, dia, gauge, lbl, brand, qty in tosrifa_rows:
         cur.execute(
             """
             INSERT INTO machine_profiles (
