@@ -306,6 +306,114 @@ def render_fakir_summary_card_html(summary: dict) -> str:
     )
 
 
+RENAISSANCE_SECTIONS = [
+    {
+        "title": "JERSEY MACHINE",
+        "show_col_headers": True,
+        "rows": [
+            (1, "30", "24", "90", "TUBE DIA", "PAILUNG", "TAIWAN", 4, "100% LYCRA ATTACHMENT"),
+            (2, "30", "24/28", "90", "TUBE DIA", "PAILUNG", "TAIWAN", 4, "100% LYCRA ATTACHMENT"),
+            (3, "30", "24/32", "90", "TUBE DIA", "PAILUNG", "TAIWAN", 2, "100% LYCRA ATTACHMENT"),
+            (4, "32", "24", "96", "TUBE DIA", "PAILUNG", "TAIWAN", 6, "100% LYCRA ATTACHMENT"),
+            (5, "34", "24", "102", "TUBE DIA", "GOANG LIH", "TAIWAN", 4, "100% LYCRA ATTACHMENT"),
+            (6, "34", "24", "102", "TUBE DIA", "PAILUNG", "TAIWAN", 4, "100% LYCRA ATTACHMENT"),
+            (7, "34", "24", "102", "OPEN DIA", "PAILUNG", "TAIWAN", 2, "100% LYCRA ATTACHMENT"),
+            (8, "34", "24", "204", "TUBE DIA", "GOANG LIH", "TAIWAN", 2, "MULTI FEEDER (6-FEEDER)"),
+            (9, "36", "24", "108", "TUBE DIA", "PAILUNG", "TAIWAN", 7, "100% LYCRA ATTACHMENT"),
+            (10, "36", "24/20", "108", "OPEN DIA", "PAILUNG", "TAIWAN", 2, "100% LYCRA ATTACHMENT"),
+            (11, "38", "24", "114", "OPEN DIA", "PAILUNG", "TAIWAN", 2, "100% LYCRA ATTACHMENT"),
+        ],
+        "footers": [("TOTAL", 39)],
+    },
+    {
+        "title": "RIB+INTERLOCK MACHINE",
+        "show_col_headers": False,
+        "rows": [
+            (12, "36", "18/24", "72", "", "PAILUNG", "TAIWAN", 6, "100% LYCRA ATTACHMENT"),
+            (13, "38", "16/18/24", "76", "", "PAILUNG", "TAIWAN", 4, "100% LYCRA ATTACHMENT"),
+            (14, "40", "18", "80", "", "PAILUNG", "TAIWAN", 4, "100% LYCRA ATTACHMENT"),
+            (15, "42", "18", "84", "", "PAILUNG", "TAIWAN", 4, "100% LYCRA ATTACHMENT"),
+            (16, "44", "18", "88", "", "PAILUNG", "TAIWAN", 2, "100% LYCRA ATTACHMENT"),
+        ],
+        "footers": [("TOTAL", 20)],
+    },
+    {
+        "title": "FLEECE MACHINE",
+        "show_col_headers": False,
+        "rows": [
+            (17, "34", "20", "108", "", "GOANG LIH", "TAIWAN", 8, "100% LYCRA ATTACHMENT"),
+        ],
+        "footers": [
+            ("TOTAL", 8),
+            ("TOTAL NO OF CIRCULAR KNITTING MACHINE", 67),
+        ],
+    },
+    {
+        "title": "FLAT KNIT MACHINE",
+        "show_col_headers": False,
+        "rows": [
+            (18, "80", "14", "", "", "MATSUYA", "CHINA", 12, "100% LYCRA ATTACHMENT"),
+        ],
+        "footers": [
+            ("TOTAL NO OF FLAT KNITTING MACHINE", 12),
+        ],
+    },
+]
+
+
+def render_renaissance_profile_html() -> str:
+    """Render Renaissance Apparels Ltd. Knitting Machine Profile (Jersey, Rib+Interlock, Fleece, Flat Knit; excluding Utility)."""
+    blocks_html = []
+    for sec in RENAISSANCE_SECTIONS:
+        trs = [
+            f'<tr><td colspan="9" style="background-color:#bdd7ee;color:#0f172a;font-weight:800;text-align:center;padding:6px;border:1px solid #0f172a;">{html.escape(sec["title"])}</td></tr>'
+        ]
+        if sec["show_col_headers"]:
+            trs.append(
+                "<tr>"
+                '<th style="background-color:#c6e0b4;color:#0f172a;border:1px solid #0f172a;width:7%;">SL.NO.</th>'
+                '<th style="background-color:#c6e0b4;color:#0f172a;border:1px solid #0f172a;width:9%;">M/C DIA</th>'
+                '<th style="background-color:#c6e0b4;color:#0f172a;border:1px solid #0f172a;width:11%;">M/C GAUGE</th>'
+                '<th style="background-color:#c6e0b4;color:#0f172a;border:1px solid #0f172a;width:9%;">FEEDER</th>'
+                '<th style="background-color:#c6e0b4;color:#0f172a;border:1px solid #0f172a;width:13%;">TYPES OF DIA</th>'
+                '<th style="background-color:#c6e0b4;color:#0f172a;border:1px solid #0f172a;width:13%;">BRAND</th>'
+                '<th style="background-color:#c6e0b4;color:#0f172a;border:1px solid #0f172a;width:10%;">ORIGIN</th>'
+                '<th style="background-color:#c6e0b4;color:#0f172a;border:1px solid #0f172a;width:10%;">QUANTITY</th>'
+                '<th style="background-color:#c6e0b4;color:#0f172a;border:1px solid #0f172a;width:18%;">REMARKS</th>'
+                "</tr>"
+            )
+        for sl, dia, gg, feeder, dtype, brand, origin, qty, rem in sec["rows"]:
+            trs.append(
+                f"<tr>"
+                f'<td class="total-col" style="width:7%;">{sl}</td>'
+                f'<td class="total-col" style="width:9%;">{html.escape(dia)}</td>'
+                f'<td class="total-col" style="width:11%;">{html.escape(gg)}</td>'
+                f'<td class="total-col" style="width:9%;">{html.escape(feeder)}</td>'
+                f'<td class="total-col" style="width:13%;">{html.escape(dtype)}</td>'
+                f'<td class="total-col" style="width:13%;">{html.escape(brand)}</td>'
+                f'<td class="total-col" style="width:10%;">{html.escape(origin)}</td>'
+                f'<td class="total-col" style="width:10%;"><strong>{qty}</strong></td>'
+                f'<td class="total-col" style="width:18%;">{html.escape(rem)}</td>'
+                f"</tr>"
+            )
+        for f_label, f_val in sec["footers"]:
+            trs.append(
+                f"<tr>"
+                f'<td colspan="7" style="text-align:center;font-weight:800;border:1px solid #0f172a;padding:6px;">{html.escape(f_label)}</td>'
+                f'<td class="total-col" style="font-weight:800;border:1px solid #0f172a;padding:6px;">{f_val}</td>'
+                f'<td style="border:1px solid #0f172a;"></td>'
+                f"</tr>"
+            )
+        blocks_html.append(
+            f'<div class="mp-sheet-container" style="max-width:960px;margin-bottom:0.85rem;">'
+            f'<table class="mp-sheet-table" style="font-size:0.86rem;">'
+            f'<tbody>{"".join(trs)}</tbody>'
+            f"</table>"
+            f"</div>"
+        )
+    return "".join(blocks_html)
+
+
 # Session state navigation
 if "current_view" not in st.session_state:
     st.session_state.current_view = "directory"
@@ -667,9 +775,19 @@ else:
 
         is_fakir = "fakir knitwear" in industry["name"].lower()
         is_masco = "masco" in industry["name"].lower()
+        is_renaissance = "renaissance" in industry["name"].lower()
         fakir_data = db.get_fakir_knitting_data() if is_fakir else None
 
-        if is_masco:
+        if is_renaissance:
+            mk1, mk2, mk3, mk4 = st.columns(4)
+            mk1.metric("Grand Total Machines", "79")
+            mk2.metric("Circular Knitting Machines", "67")
+            mk3.metric("Flat Knitting Machines", "12")
+            mk4.metric("Machine Brands", "3 (Pailung, Goang Lih, Matsuya)")
+
+            st.markdown(render_renaissance_profile_html(), unsafe_allow_html=True)
+
+        elif is_masco:
             import masco_data
 
             mk1, mk2, mk3, mk4 = st.columns(4)

@@ -205,6 +205,9 @@ def init_db():
     # Seed MASCO (Concept Knitting) machine profile if empty
     seed_masco_machines(conn)
 
+    # Seed Renaissance Apparels Ltd. machine profile if empty
+    seed_renaissance_machines(conn)
+
     conn.close()
 
 
@@ -768,6 +771,51 @@ def seed_masco_machines(conn):
         ("Unit-2 Collar (Flat Knit)", 0, 14, "40\"–80\" Bed", "MATSUYA / KAUO HENG", 28),
     ]
     for fab, dia, gauge, lbl, brand, qty in masco_summary_rows:
+        cur.execute(
+            """
+            INSERT INTO machine_profiles (
+                industry_id, fabrication, dia, gauge, dia_gauge_label, brand, quantity,
+                needles_per_machine, sinkers_per_machine
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+            """,
+            (ind_id, fab, dia, gauge, lbl, brand, qty),
+        )
+    conn.commit()
+
+
+def seed_renaissance_machines(conn):
+    """Seed Renaissance Apparels Ltd. knitting machines (67 Circular + 12 Flat Knit = 79) into machine_profiles."""
+    cur = conn.cursor()
+    row = cur.execute("SELECT id FROM industries WHERE name LIKE '%Renaissance%' LIMIT 1").fetchone()
+    if not row:
+        return
+    ind_id = row["id"]
+
+    cnt = cur.execute("SELECT COUNT(*) as c FROM machine_profiles WHERE industry_id = ?", (ind_id,)).fetchone()["c"]
+    if cnt > 0:
+        return
+
+    renaissance_rows = [
+        ("Jersey Machine", 30, 24, "30x24", "PAILUNG", 4),
+        ("Jersey Machine", 30, 24, "30x24/28", "PAILUNG", 4),
+        ("Jersey Machine", 30, 24, "30x24/32", "PAILUNG", 2),
+        ("Jersey Machine", 32, 24, "32x24", "PAILUNG", 6),
+        ("Jersey Machine", 34, 24, "34x24", "GOANG LIH", 4),
+        ("Jersey Machine", 34, 24, "34x24", "PAILUNG", 4),
+        ("Jersey Machine", 34, 24, "34x24 (Open Dia)", "PAILUNG", 2),
+        ("Jersey Machine", 34, 24, "34x24 (Multi Feeder)", "GOANG LIH", 2),
+        ("Jersey Machine", 36, 24, "36x24", "PAILUNG", 7),
+        ("Jersey Machine", 36, 24, "36x24/20 (Open Dia)", "PAILUNG", 2),
+        ("Jersey Machine", 38, 24, "38x24 (Open Dia)", "PAILUNG", 2),
+        ("Rib+Interlock Machine", 36, 18, "36x18/24", "PAILUNG", 6),
+        ("Rib+Interlock Machine", 38, 16, "38x16/18/24", "PAILUNG", 4),
+        ("Rib+Interlock Machine", 40, 18, "40x18", "PAILUNG", 4),
+        ("Rib+Interlock Machine", 42, 18, "42x18", "PAILUNG", 4),
+        ("Rib+Interlock Machine", 44, 18, "44x18", "PAILUNG", 2),
+        ("Fleece Machine", 34, 20, "34x20", "GOANG LIH", 8),
+        ("Flat Knit Machine", 80, 14, "80x14", "MATSUYA", 12),
+    ]
+    for fab, dia, gauge, lbl, brand, qty in renaissance_rows:
         cur.execute(
             """
             INSERT INTO machine_profiles (
