@@ -866,6 +866,107 @@ def render_sm_profile_html() -> str:
     )
 
 
+GRAMTECH_SECTIONS = [
+    (
+        "High Speed Open Width Single Jersey Machine- 14 Sets",
+        True,
+        [
+            (1, 32, "24,28", 102, "Open Dia", "PAILUNG", "TAIWAN", 3, "S/J , Lycra S/J and All S/J Derivatives Fabric", "100% Lycra Attachment"),
+            (2, 32, "24", 102, "Open Dia", "JIUNN LONG", "TAIWAN", 2, "S/J , Lycra S/J and All S/J Derivatives Fabric", "100% Lycra Attachment"),
+            (3, 34, "24,28", 108, "Open Dia", "PAILUNG", "TAIWAN", 2, "S/J , Lycra S/J and All S/J Derivatives Fabric", "100% Lycra Attachment"),
+            (4, 34, "20,24", 108, "Open Dia", "JIUNN LONG", "TAIWAN", 3, "S/J , Lycra S/J and All S/J Derivatives Fabric", "100% Lycra Attachment"),
+            (5, 36, "24", 116, "Open Dia", "PAILUNG", "TAIWAN", 1, "S/J , Lycra S/J and All S/J Derivatives Fabric", "100% Lycra Attachment"),
+            (6, 36, "24", 116, "Open Dia", "JIUNN LONG", "TAIWAN", 2, "S/J , Lycra S/J and All S/J Derivatives Fabric", "100% Lycra Attachment"),
+            (7, 38, "24", 120, "Open Dia", "PAILUNG", "TAIWAN", 1, "S/J , Lycra S/J and All S/J Derivatives Fabric", "100% Lycra Attachment"),
+        ],
+    ),
+    (
+        "Tube Single Jersey Machine- 3 Sets",
+        False,
+        [
+            (8, 26, "24", 78, "Tube Dia", "ZENTEX", "SINGAPUR", 1, "S/J , Lycra S/J and All S/J Derivatives Fabric", "100% Lycra Attachment"),
+            (9, 30, "24", 90, "Tube Dia", "ZENTEX", "SINGAPUR", 2, "S/J , Lycra S/J and All S/J Derivatives Fabric", "100% Lycra Attachment"),
+        ],
+    ),
+    (
+        "High Speed Tube Fleece Machine- 4 Sets",
+        False,
+        [
+            (10, 34, "20,24", 108, "Tube Dia", "GOANG LIH", "TAIWAN", 2, "Fleece, Baby Fleece, Cross Fleece, Fleece Derivatives", "100% Lycra Attachment"),
+            (11, 36, "20,24", 116, "Tube Dia", "GOANG LIH", "TAIWAN", 2, "Fleece, Baby Fleece, Cross Fleece, Fleece Derivatives", "100% Lycra Attachment"),
+        ],
+    ),
+    (
+        "TUBE RIB/ INTERLOCK Machine- 7 Sets",
+        False,
+        [
+            (12, 32, "18", 64, "Tube Dia", "ZENTEX", "SINGAPUR", 1, "RIB, Lycra RIB and All RIB Derivatives Fabric", "100% Lycra Attachment"),
+            (13, 34, "18", 68, "Tube Dia", "ZENTEX", "SINGAPUR", 1, "RIB, Lycra RIB and All RIB Derivatives Fabric", "100% Lycra Attachment"),
+            (14, 36, "18", 72, "Tube Dia", "ZENTEX", "SINGAPUR", 1, "RIB, Lycra RIB and All RIB Derivatives Fabric", "100% Lycra Attachment"),
+            (15, 38, "18", 72, "Tube Dia", "ZENTEX", "SINGAPUR", 1, "RIB, Lycra RIB and All RIB Derivatives Fabric", "100% Lycra Attachment"),
+            (16, 40, "18,24", 80, "Tube Dia", "JIUNN LONG", "TAIWAN", 1, "RIB, Lycra RIB and All RIB Derivatives Fabric", "100% Lycra Attachment"),
+            (17, 42, "18,24,28", 84, "Tube Dia", "JIUNN LONG", "TAIWAN", 2, "RIB, Lycra RIB and All RIB Derivatives Fabric", "100% Lycra Attachment"),
+        ],
+    ),
+    (
+        "Flat Knit Machines-4 Sets",
+        False,
+        [
+            (18, 80, "14", 6, "", "KAUO HENG Co.", "Taiwan", 4, "Non Jacquard", "100% Lycra Attachment"),
+        ],
+    ),
+]
+
+
+def render_gramtech_profile_html() -> str:
+    """Render Gram Tech (Sonali Textile) Knitting Machine Profile table matching reference image."""
+    trs = [
+        '<tr><td colspan="10" style="background-color:#f1f5f9;color:#0f172a;font-weight:800;text-align:center;font-size:1.1rem;padding:8px;border:1.5px solid #0f172a;">Total Number of Machines = 28 Sets</td></tr>'
+    ]
+    for sec_title, show_headers, rows in GRAMTECH_SECTIONS:
+        trs.append(
+            f'<tr><td colspan="10" style="background-color:#cbd5e1;color:#0f172a;font-weight:800;text-align:center;font-size:0.98rem;padding:7px;border:1.5px solid #0f172a;">{html.escape(sec_title)}</td></tr>'
+        )
+        if show_headers:
+            trs.append(
+                "<tr>"
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:5%;">SL. No.</th>'
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:7%;">Machine Dia</th>'
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:9%;">M/C Gauge</th>'
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:7%;">No. Of Feeders</th>'
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:9%;">Types Of Dia</th>'
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:11%;">Brand</th>'
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:9%;">Origin</th>'
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:8%;">M/c QUANTITY</th>'
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:21%;">Fabric Type</th>'
+                '<th style="background-color:#ffffff;color:#0f172a;border:1px solid #0f172a;width:14%;">Remarks</th>'
+                "</tr>"
+            )
+        for sl, dia, gg, fd, dtype, brand, origin, qty, ftype, rem in rows:
+            trs.append(
+                f"<tr>"
+                f'<td class="total-col"><strong>{sl}</strong></td>'
+                f'<td class="total-col"><strong>{dia}</strong></td>'
+                f'<td class="total-col"><strong>{html.escape(gg)}</strong></td>'
+                f'<td class="total-col"><strong>{fd}</strong></td>'
+                f'<td class="total-col"><strong>{html.escape(dtype)}</strong></td>'
+                f'<td class="total-col"><strong>{html.escape(brand)}</strong></td>'
+                f'<td class="total-col"><strong>{html.escape(origin)}</strong></td>'
+                f'<td class="total-col"><strong>{qty}</strong></td>'
+                f'<td class="total-col"><strong>{html.escape(ftype)}</strong></td>'
+                f'<td class="total-col"><strong>{html.escape(rem)}</strong></td>'
+                f"</tr>"
+            )
+
+    return (
+        f'<div class="mp-sheet-container" style="max-width:1020px;margin-bottom:1rem;">'
+        f'<table class="mp-sheet-table" style="font-size:0.83rem;">'
+        f'<tbody>{"".join(trs)}</tbody>'
+        f"</table>"
+        f"</div>"
+    )
+
+
 # Session state navigation
 if "current_view" not in st.session_state:
     st.session_state.current_view = "directory"
@@ -1231,9 +1332,19 @@ else:
         is_adury = "adury" in industry["name"].lower()
         is_tosrifa = "tosrifa" in industry["name"].lower()
         is_sm = "s.m." in industry["name"].lower()
+        is_gramtech = "gram tech" in industry["name"].lower() or "gramtech" in industry["name"].lower()
         fakir_data = db.get_fakir_knitting_data() if is_fakir else None
 
-        if is_sm:
+        if is_gramtech:
+            mk1, mk2, mk3, mk4 = st.columns(4)
+            mk1.metric("Total Circular Machines", "28 Sets")
+            mk2.metric("Flat Knit Machines", "4 Sets")
+            mk3.metric("Grand Total Machines", "32 Sets")
+            mk4.metric("Machine Brands", "5 (Pailung, Jiunn Long, Zentex, Goang Lih, Kauo Heng)")
+
+            st.markdown(render_gramtech_profile_html(), unsafe_allow_html=True)
+
+        elif is_sm:
             mk1, mk2, mk3, mk4 = st.columns(4)
             mk1.metric("Total Machine Sets", "99")
             mk2.metric("Total Cylinders (28G–14G)", "147 (28G:5 | 24G:66 | 20G:41 | 18G:26 | 14G:9)")

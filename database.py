@@ -217,6 +217,9 @@ def init_db():
     # Seed S.M. Group (S.M. Knitwears) machine profile if empty
     seed_sm_machines(conn)
 
+    # Seed Gram Tech (Sonali Textile) machine profile if empty
+    seed_gramtech_machines(conn)
+
     conn.close()
 
 
@@ -927,6 +930,38 @@ def seed_sm_machines(conn):
         ("Rib/Interlock", 35, 18, "32\"–38\" x 18G/24G", "Fukuhara / Lisky / Pai Lung", 12),
     ]
     for fab, dia, gauge, lbl, brand, qty in sm_rows:
+        cur.execute(
+            """
+            INSERT INTO machine_profiles (
+                industry_id, fabrication, dia, gauge, dia_gauge_label, brand, quantity,
+                needles_per_machine, sinkers_per_machine
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+            """,
+            (ind_id, fab, dia, gauge, lbl, brand, qty),
+        )
+    conn.commit()
+
+
+def seed_gramtech_machines(conn):
+    """Seed Gram Tech (Sonali Textile) knitting machines (28 Circular + 4 Flat Knit = 32 Sets) into machine_profiles."""
+    cur = conn.cursor()
+    row = cur.execute("SELECT id FROM industries WHERE name LIKE '%Gram%Tech%' LIMIT 1").fetchone()
+    if not row:
+        return
+    ind_id = row["id"]
+
+    cnt = cur.execute("SELECT COUNT(*) as c FROM machine_profiles WHERE industry_id = ?", (ind_id,)).fetchone()["c"]
+    if cnt > 0:
+        return
+
+    gramtech_rows = [
+        ("High Speed Open Width Single Jersey", 34, 24, "32\"–38\" x 20/24/28G", "PAILUNG / JIUNN LONG", 14),
+        ("Tube Single Jersey", 28, 24, "26\"–30\" x 24G", "ZENTEX", 3),
+        ("High Speed Tube Fleece", 35, 20, "34\"–36\" x 20,24G", "GOANG LIH", 4),
+        ("Tube Rib / Interlock", 36, 18, "32\"–42\" x 18/24/28G", "ZENTEX / JIUNN LONG", 7),
+        ("Flat Knit Machines", 80, 14, "80\" x 14G", "KAUO HENG Co.", 4),
+    ]
+    for fab, dia, gauge, lbl, brand, qty in gramtech_rows:
         cur.execute(
             """
             INSERT INTO machine_profiles (
