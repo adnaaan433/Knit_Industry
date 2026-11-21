@@ -222,6 +222,90 @@ def render_machine_profile_html(industry: dict, machines: list) -> str:
     )
 
 
+def render_fakir_block_html(block: dict) -> str:
+    """Render one Fakir Knitwears machine block (Serial No., M/C NO., BRAND, ORIGIN, M/C Dia, M/C Gauge, Feeders, M/C Type, QTY.)."""
+    rows_html = []
+    for r in block["rows"]:
+        is_not_opt = "NOT IN OPERATION" in r["brand"].upper()
+        row_style = ' style="background-color:#fee2e2;color:#991b1b;font-weight:600;"' if is_not_opt else ""
+        rows_html.append(
+            f"<tr{row_style}>"
+            f'<td class="total-col">{r["sn"]}</td>'
+            f'<td class="total-col"><strong>{html.escape(r["mc_no"])}</strong></td>'
+            f'<td class="brand-col">{html.escape(r["brand"])}</td>'
+            f'<td class="total-col">{html.escape(r["origin"])}</td>'
+            f'<td class="total-col">{html.escape(r["dia"])}</td>'
+            f'<td class="total-col">{html.escape(r["gauge"])}</td>'
+            f'<td class="total-col">{html.escape(str(r["feeders"]))}</td>'
+            f'<td class="total-col">{html.escape(r["mc_type"])}</td>'
+            f'<td class="total-col">{r["qty"]}</td>'
+            f"</tr>"
+        )
+
+    rows_html.append(
+        f'<tr class="sheet-subtotal-row">'
+        f'<td colspan="8" style="text-align:right;">Total=</td>'
+        f'<td class="total-col" style="background-color:#8ea9db;">{block["total"]}</td>'
+        f"</tr>"
+    )
+
+    sn_head = html.escape(block.get("header_sn", "Serial No."))
+    return (
+        f'<div class="mp-sheet-container" style="max-width:100%;margin-bottom:1rem;">'
+        f'<table class="mp-sheet-table" style="font-size:0.84rem;">'
+        f"<thead><tr>"
+        f"<th>{sn_head}</th>"
+        f"<th>M/C NO.</th>"
+        f"<th>BRAND</th>"
+        f"<th>ORIGIN</th>"
+        f"<th>M/C Dia</th>"
+        f"<th>M/C Gauge</th>"
+        f"<th>Feeders</th>"
+        f"<th>M/C Type</th>"
+        f"<th>QTY.</th>"
+        f"</tr></thead>"
+        f'<tbody>{"".join(rows_html)}</tbody>'
+        f"</table>"
+        f"</div>"
+    )
+
+
+def render_fakir_summary_card_html(summary: dict) -> str:
+    """Render the 4-part summary table (Brand wise, M/C typewise, Dia wise, Gauge wise) matching Fakir's Excel sheet."""
+    def _subtable(header_label: str, pairs: list) -> str:
+        trs = []
+        for k, v in pairs:
+            is_tot = "TOTAL" in str(k).upper()
+            cls = ' class="sheet-subtotal-row"' if is_tot else ""
+            bg = ' style="background-color:#8ea9db;"' if is_tot else ""
+            trs.append(
+                f"<tr{cls}>"
+                f"<td{bg}>{html.escape(str(k))}</td>"
+                f'<td class="total-col"{bg}><strong>{v}</strong></td>'
+                f"</tr>"
+            )
+        return (
+            f'<table class="mp-sheet-table" style="font-size:0.86rem;">'
+            f'<thead><tr><th colspan="2">{html.escape(header_label)}</th></tr></thead>'
+            f'<tbody>{"".join(trs)}</tbody>'
+            f"</table>"
+        )
+
+    return (
+        f'<div style="margin:0.75rem 0 1.25rem 0;padding:12px 14px;border:1.5px solid #334155;background:#f8fafc;color:#0f172a;border-radius:6px;">'
+        f'<div style="font-weight:800;font-size:1.05rem;margin-bottom:10px;color:#0f172a;text-decoration:underline;">'
+        f'{html.escape(summary["title"])}'
+        f"</div>"
+        f'<div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:12px;align-items:start;">'
+        f'<div>{_subtable("Brand wise:", summary["brand_wise"])}</div>'
+        f'<div>{_subtable("M/C typewise:", summary["type_wise"])}</div>'
+        f'<div>{_subtable("Dia wise:", summary["dia_wise"])}</div>'
+        f'<div>{_subtable("Gauge wise:", summary["gauge_wise"])}</div>'
+        f"</div>"
+        f"</div>"
+    )
+
+
 # Session state navigation
 if "current_view" not in st.session_state:
     st.session_state.current_view = "directory"
@@ -581,7 +665,64 @@ else:
     with tab_machines:
         st.subheader(f"⚙️ Machine Profile — {industry['name']}")
 
-        if not machines:
+        is_fakir = "fakir knitwear" in industry["name"].lower()
+        fakir_data = db.get_fakir_knitting_data() if is_fakir else None
+
+        if is_fakir and fakir_data:
+            mk1, mk2, mk3, mk4 = st.columns(4)
+            mk1.metric("Grand Total Machines", "167 (165 Opt.)")
+            mk2.metric("Knitting Unit-1", "109 (107 Opt.)")
+            mk3.metric("Knitting Unit-2", "58")
+            mk4.metric("Machine Brands", "5")
+
+            fk_tab1, fk_tab2, fk_tab3 = st.tabs(
+                [
+                    "🏭 Knitting Unit-1 (Sheet 1 — 109 Machines)",
+                    "🏭 Knitting Unit-2 & Overall Summary (Sheet 2 — 58 Machines)",
+                    "📊 Consolidated Table (Unit 1 + Unit 2)",
+                ]
+            )
+
+            with fk_tab1:
+                u1_blocks = fakir_data["unit1_blocks"]
+                # Group blocks by row_start so left (col 1) and right (col 11) appear side by side just like Sheet1
+                u1_by_row = defaultdict(list)
+                for b in u1_blocks:
+                    u1_by_row[b["row_start"]].append(b)
+                for r_start in sorted(u1_by_row.keys()):
+                    pair = sorted(u1_by_row[r_start], key=lambda x: x["col_start"])
+                    c_left, c_right = st.columns(2)
+                    with c_left:
+                        st.markdown(render_fakir_block_html(pair[0]), unsafe_allow_html=True)
+                    if len(pair) > 1:
+                        with c_right:
+                            st.markdown(render_fakir_block_html(pair[1]), unsafe_allow_html=True)
+
+                st.markdown(render_fakir_summary_card_html(fakir_data["unit1_summary"]), unsafe_allow_html=True)
+
+            with fk_tab2:
+                u2_blocks = fakir_data["unit2_blocks"]
+                u2_by_row = defaultdict(list)
+                for b in u2_blocks:
+                    u2_by_row[b["row_start"]].append(b)
+                for r_start in sorted(u2_by_row.keys()):
+                    pair = sorted(u2_by_row[r_start], key=lambda x: x["col_start"])
+                    c_left, c_right = st.columns(2)
+                    with c_left:
+                        st.markdown(render_fakir_block_html(pair[0]), unsafe_allow_html=True)
+                    if len(pair) > 1:
+                        with c_right:
+                            st.markdown(render_fakir_block_html(pair[1]), unsafe_allow_html=True)
+
+                st.markdown(render_fakir_summary_card_html(fakir_data["unit2_summary"]), unsafe_allow_html=True)
+                st.markdown(render_fakir_summary_card_html(fakir_data["overall_summary"]), unsafe_allow_html=True)
+
+            with fk_tab3:
+                st.markdown(render_fakir_summary_card_html(fakir_data["overall_summary"]), unsafe_allow_html=True)
+                if machines:
+                    st.markdown(render_machine_profile_html(industry, machines), unsafe_allow_html=True)
+
+        elif not machines:
             st.info(
                 "No machine profile table has been added for this industry yet. "
                 "Share the factory's machine profile photo or PDF in the chat to have its exact table format added here."

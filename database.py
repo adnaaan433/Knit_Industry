@@ -5,6 +5,7 @@ import openpyxl
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "crm_data.db")
 EXCEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Knit Industry Contacts.xlsx")
+FAKIR_EXCEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Fakir Knitwears Ltd Knitting Section.xlsx")
 
 # Name normalization map to link Contacts sheet names to canonical Factory Locations names
 NAME_MAPPING = {
@@ -197,6 +198,9 @@ def init_db():
 
     # Seed L'Esquire Knit Composite Ltd. machine profile from example image if empty
     seed_lesquire_machines(conn)
+
+    # Seed Fakir Knitwears Ltd. machine profile from Fakir Knitwears Ltd Knitting Section.xlsx if empty
+    seed_fakir_machines(conn)
 
     conn.close()
 
@@ -456,6 +460,267 @@ def seed_lesquire_machines(conn):
                 calc["needles_per_machine"],
                 calc["sinkers_per_machine"],
             ),
+        )
+    conn.commit()
+
+
+def _parse_fakir_unit_blocks(ws):
+    blocks = []
+    for r_idx in range(1, ws.max_row + 1):
+        for col_start in (1, 11):
+            v1 = str(ws.cell(r_idx, col_start).value or "").strip()
+            v2 = str(ws.cell(r_idx, col_start + 1).value or "").strip()
+            if v1 in ("Serial No.", "SL.") and "M/C" in v2:
+                rows = []
+                total_val = 0
+                curr = r_idx + 1
+                while curr <= ws.max_row:
+                    sn = ws.cell(curr, col_start).value
+                    mc = ws.cell(curr, col_start + 1).value
+                    mt = str(ws.cell(curr, col_start + 7).value or "").strip()
+                    qty = ws.cell(curr, col_start + 8).value
+                    if "Total" in mt:
+                        try:
+                            total_val = int(float(qty))
+                        except (ValueError, TypeError):
+                            total_val = len(rows)
+                        break
+                    if sn is None and mc is None:
+                        break
+                    if mc is not None and str(mc).strip():
+                        raw_feed = ws.cell(curr, col_start + 6).value
+                        try:
+                            feed_str = str(int(float(raw_feed))) if raw_feed not in (None, "—", "") else "—"
+                        except (ValueError, TypeError):
+                            feed_str = str(raw_feed)
+                        try:
+                            sn_val = int(float(sn)) if sn not in (None, " ") else len(rows) + 1
+                        except (ValueError, TypeError):
+                            sn_val = len(rows) + 1
+                        try:
+                            qty_val = int(float(qty)) if qty not in (None, "—", "") else 1
+                        except (ValueError, TypeError):
+                            qty_val = 1
+                        rows.append(
+                            {
+                                "sn": sn_val,
+                                "mc_no": str(mc).strip(),
+                                "brand": str(ws.cell(curr, col_start + 2).value or "—").strip(),
+                                "origin": str(ws.cell(curr, col_start + 3).value or "—").strip(),
+                                "dia": str(ws.cell(curr, col_start + 4).value or "—").strip(),
+                                "gauge": str(ws.cell(curr, col_start + 5).value or "—").strip(),
+                                "feeders": feed_str,
+                                "mc_type": mt if mt else "—",
+                                "qty": qty_val,
+                            }
+                        )
+                    curr += 1
+                if rows:
+                    blocks.append(
+                        {
+                            "row_start": r_idx,
+                            "col_start": col_start,
+                            "header_sn": v1,
+                            "rows": rows,
+                            "total": total_val or sum(r["qty"] for r in rows),
+                        }
+                    )
+    return blocks
+
+
+def get_fakir_knitting_data():
+    """Parse Fakir Knitwears Ltd Knitting Section.xlsx (Sheet1 = Unit 1, Sheet2 = Unit 2)."""
+    if not os.path.exists(FAKIR_EXCEL_PATH):
+        return None
+    wb = openpyxl.load_workbook(FAKIR_EXCEL_PATH, data_only=True)
+    u1_blocks = _parse_fakir_unit_blocks(wb["Sheet1"]) if "Sheet1" in wb.sheetnames else []
+    u2_blocks = _parse_fakir_unit_blocks(wb["Sheet2"]) if "Sheet2" in wb.sheetnames else []
+
+    unit1_summary = {
+        "title": "Unit-1 Summary",
+        "brand_wise": [
+            ("Jiunn Long:", 77),
+            ("U-Masa:", 28),
+            ("Fukuhara:", 1),
+            ("Samara ENT.:", 1),
+            ("NOT IN OPT.:", 2),
+            ("TOTAL:", 109),
+        ],
+        "type_wise": [
+            ("S/J:", 78),
+            ("D/J:", 28),
+            ("Jacquard:", 1),
+            ("TOTAL:", 107),
+        ],
+        "dia_wise": [
+            ("20 inch", 1),
+            ("26 inch", 1),
+            ("28 inch", 3),
+            ("30 inch", 3),
+            ("32 inch", 12),
+            ("34 inch", 10),
+            ("36 inch", 23),
+            ("38 inch", 23),
+            ("40 inch", 19),
+            ("42 inch", 7),
+            ("44 inch", 2),
+            ("46 inch", 3),
+            ("TOTAL:", 107),
+        ],
+        "gauge_wise": [
+            ("14 G", 2),
+            ("18 G", 18),
+            ("20 G", 14),
+            ("22 G", 4),
+            ("24 G", 67),
+            ("26 G", 1),
+            ("28 G", 1),
+            ("TOTAL:", 107),
+        ],
+    }
+
+    unit2_summary = {
+        "title": "Unit-2 Summary",
+        "brand_wise": [
+            ("Fukuhara", 40),
+            ("Mayer&Cie:", 18),
+            ("TOTAL:", 58),
+        ],
+        "type_wise": [
+            ("S/J:", 35),
+            ("D/J:", 14),
+            ("S/J (AS):", 6),
+            ("D/J (AS)", 1),
+            ("S/J (3th F)", 2),
+            ("TOTAL:", 58),
+        ],
+        "dia_wise": [
+            ("30 inch", 2),
+            ("32 inch", 1),
+            ("34 inch", 7),
+            ("36 inch", 13),
+            ("38 inch", 14),
+            ("40 inch", 9),
+            ("42 inch", 7),
+            ("44 inch", 5),
+            ("TOTAL:", 58),
+        ],
+        "gauge_wise": [
+            ("18 G", 13),
+            ("20 G", 3),
+            ("24 G", 37),
+            ("28 G", 4),
+            ("36 G", 1),
+            ("TOTAL:", 58),
+        ],
+    }
+
+    overall_summary = {
+        "title": "Overall Summary",
+        "brand_wise": [
+            ("Jiunn Long:", 77),
+            ("U-Masa:", 28),
+            ("Samara ENT.:", 1),
+            ("Fukuhara", 41),
+            ("Mayer&Cie:", 18),
+            ("TOTAL:", 165),
+        ],
+        "type_wise": [
+            ("S/J:", 113),
+            ("D/J:", 42),
+            ("S/J (AS):", 6),
+            ("D/J (AS)", 1),
+            ("S/J (3th F)", 2),
+            ("Jacquard:", 1),
+            ("TOTAL:", 165),
+        ],
+        "dia_wise": [
+            ("20 inch", 1),
+            ("26 inch", 1),
+            ("28 inch", 3),
+            ("30 inch", 5),
+            ("32 inch", 13),
+            ("34 inch", 17),
+            ("36 inch", 36),
+            ("38 inch", 37),
+            ("40 inch", 28),
+            ("42 inch", 14),
+            ("44 inch", 7),
+            ("46 inch", 3),
+            ("TOTAL:", 165),
+        ],
+        "gauge_wise": [
+            ("14 G", 2),
+            ("18 G", 31),
+            ("20 G", 17),
+            ("22 G", 4),
+            ("24 G", 104),
+            ("26 G", 1),
+            ("28 G", 5),
+            ("36 G", 1),
+            ("TOTAL:", 165),
+        ],
+    }
+
+    return {
+        "unit1_blocks": u1_blocks,
+        "unit2_blocks": u2_blocks,
+        "unit1_summary": unit1_summary,
+        "unit2_summary": unit2_summary,
+        "overall_summary": overall_summary,
+    }
+
+
+def seed_fakir_machines(conn):
+    """Seed Fakir Knitwears Ltd. consolidated machine rows into machine_profiles so total counts appear across the CRM."""
+    if not os.path.exists(FAKIR_EXCEL_PATH):
+        return
+    cur = conn.cursor()
+    row = cur.execute("SELECT id FROM industries WHERE name LIKE '%Fakir Knitwear%' LIMIT 1").fetchone()
+    if not row:
+        return
+    ind_id = row["id"]
+
+    cnt = cur.execute("SELECT COUNT(*) as c FROM machine_profiles WHERE industry_id = ?", (ind_id,)).fetchone()["c"]
+    if cnt > 0:
+        return
+
+    data = get_fakir_knitting_data()
+    if not data:
+        return
+
+    grouped_counts = {}
+    for unit_name, blocks in [("Unit-1", data["unit1_blocks"]), ("Unit-2", data["unit2_blocks"])]:
+        for b in blocks:
+            for r in b["rows"]:
+                mc_type = r["mc_type"] if r["mc_type"] != "—" else "Not in Operation"
+                brand = r["brand"].replace("Mayer&Cie", "Mayer & Cie")
+                dia_num = 0.0
+                gauge_num = 0.0
+                m_d = re.search(r"(\d+)", r["dia"])
+                m_g = re.search(r"(\d+)", r["gauge"])
+                if m_d:
+                    dia_num = float(m_d.group(1))
+                if m_g:
+                    gauge_num = float(m_g.group(1))
+                if dia_num > 0 and gauge_num > 0:
+                    label = f"{int(dia_num)}x{int(gauge_num)}"
+                else:
+                    label = "—"
+                key = (mc_type, dia_num, gauge_num, label, brand)
+                grouped_counts[key] = grouped_counts.get(key, 0) + int(r["qty"])
+
+    for (mc_type, dia_num, gauge_num, label, brand), qty in sorted(
+        grouped_counts.items(), key=lambda x: (x[0][0], x[0][1], x[0][2], x[0][4])
+    ):
+        cur.execute(
+            """
+            INSERT INTO machine_profiles (
+                industry_id, fabrication, dia, gauge, dia_gauge_label, brand, quantity,
+                needles_per_machine, sinkers_per_machine
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+            """,
+            (ind_id, mc_type, dia_num, gauge_num, label, brand, qty),
         )
     conn.commit()
 
