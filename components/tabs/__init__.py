@@ -1,0 +1,1 @@
+"""Factory detail tabs package."""

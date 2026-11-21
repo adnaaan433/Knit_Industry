@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 venv/
 env/
+*.pre_migration.db
+.streamlit/secrets.toml
 .DS_Store
 Thumbs.db
-
