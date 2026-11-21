@@ -16,41 +16,184 @@ st.set_page_config(
 # Initialize SQLite DB and seed from Excel + L'Esquire example
 db.init_db()
 
-# Custom CSS for clean cards, status badges, and Excel-like Machine Profile Table
+# Custom CSS for modern SaaS look, Landing Page, Industry Cards, and Custom Machine Profile Tables
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .block-container {
+        padding-top: 1.6rem !important;
+        padding-bottom: 3rem !important;
+        max-width: 1380px !important;
+    }
+
+    /* Status Badges */
     .status-badge {
         display: inline-block;
-        padding: 3px 10px;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.4px;
+        letter-spacing: 0.6px;
     }
-    .status-Visited { background-color: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
-    .status-Scheduled { background-color: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
-    .status-Contacted { background-color: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
-    .status-Follow-up { background-color: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
-    .status-Active { background-color: #dcfce7; color: #166534; border: 1px solid #4ade80; }
-    .status-New { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .status-Visited { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .status-Scheduled { background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .status-Contacted { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .status-Follow-up { background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .status-Active { background: rgba(34, 197, 94, 0.22); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.5); }
+    .status-New { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
+
+    /* Landing Page Hero */
+    .landing-hero {
+        position: relative;
+        padding: 2.6rem 2.8rem;
+        border-radius: 20px;
+        background: radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.25) 0%, rgba(17, 24, 39, 0.92) 55%, rgba(10, 14, 26, 0.98) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.32);
+        box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+        margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow {
+        display: inline-block;
+        padding: 5px 14px;
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.16);
+        border: 1px solid rgba(96, 165, 250, 0.35);
+        color: #60a5fa;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 1.1px;
+        text-transform: uppercase;
+        margin-bottom: 0.9rem;
+    }
+    .hero-title {
+        font-size: 2.55rem;
+        font-weight: 800;
+        line-height: 1.18;
+        margin: 0 0 0.75rem 0;
+        background: linear-gradient(90deg, #ffffff 0%, #93c5fd 55%, #38bdf8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+        font-size: 1.05rem;
+        color: #94a3b8;
+        max-width: 760px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Glassmorphic KPI Cards */
+    .kpi-card {
+        padding: 1.35rem 1.4rem;
+        border-radius: 16px;
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.65) 0%, rgba(15, 23, 42, 0.85) 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        margin-bottom: 0.8rem;
+    }
+    .kpi-icon {
+        font-size: 1.35rem;
+        margin-bottom: 0.4rem;
+    }
+    .kpi-value {
+        font-size: 2.05rem;
+        font-weight: 800;
+        color: #f8fafc;
+        line-height: 1.15;
+        font-variant-numeric: tabular-nums;
+    }
+    .kpi-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #94a3b8;
+        margin-top: 0.25rem;
+    }
+    .kpi-sub {
+        font-size: 0.75rem;
+        color: #60a5fa;
+        margin-top: 0.35rem;
+        font-weight: 500;
+    }
+
+    /* Factory Directory Card */
+    .factory-card-box {
+        padding: 1.15rem 1.25rem 0.85rem 1.25rem;
+        border-radius: 14px;
+        background: linear-gradient(160deg, rgba(30, 41, 59, 0.55) 0%, rgba(15, 23, 42, 0.8) 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        margin-bottom: 0.4rem;
+    }
+    .factory-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #f8fafc;
+        margin: 0;
+        line-height: 1.3;
+    }
+    .factory-card-loc {
+        font-size: 0.82rem;
+        color: #94a3b8;
+        margin: 0.35rem 0 0.75rem 0;
+    }
+    .stat-chip-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 0.35rem;
+    }
+    .stat-chip {
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        color: #e2e8f0;
+    }
+    .stat-chip-highlight {
+        background: rgba(59, 130, 246, 0.16);
+        border: 1px solid rgba(59, 130, 246, 0.38);
+        color: #93c5fd;
+    }
+
+    /* Section Headers */
+    .section-banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.85rem 1.25rem;
+        border-radius: 12px;
+        background: rgba(30, 41, 59, 0.45);
+        border-left: 4px solid #3b82f6;
+        border-top: 1px solid rgba(148, 163, 184, 0.15);
+        border-right: 1px solid rgba(148, 163, 184, 0.15);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        margin: 1.2rem 0 1rem 0;
+    }
+
     .industry-header-box {
-        padding: 1.2rem 1.5rem;
-        border-radius: 10px;
-        background: linear-gradient(135deg, rgba(30,64,175,0.06) 0%, rgba(15,23,42,0.03) 100%);
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        margin-bottom: 1rem;
+        padding: 1.6rem 1.9rem;
+        border-radius: 16px;
+        background: radial-gradient(circle at 90% 20%, rgba(59, 130, 246, 0.18) 0%, rgba(17, 24, 39, 0.9) 70%);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.45);
+        margin-bottom: 1.2rem;
     }
     .minute-card {
         padding: 1.1rem 1.3rem;
-        border-radius: 8px;
-        border-left: 4px solid #2563eb;
-        background-color: rgba(248, 250, 252, 0.7);
+        border-radius: 10px;
+        border-left: 4px solid #3b82f6;
+        background-color: rgba(30, 41, 59, 0.65);
         border-top: 1px solid rgba(148, 163, 184, 0.2);
         border-right: 1px solid rgba(148, 163, 184, 0.2);
         border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-        margin-bottom: 0.8rem;
+        margin-bottom: 0.6rem;
     }
     /* L'Esquire / Factory Custom Machine Profile Table */
     .mp-sheet-container {
@@ -967,13 +1110,27 @@ def render_gramtech_profile_html() -> str:
     )
 
 
-# Session state navigation
+# Session state navigation (3-tier flow: 'landing' -> 'directory' -> 'industry_page')
 if "current_view" not in st.session_state:
-    st.session_state.current_view = "directory"
+    st.session_state.current_view = "landing"
 if "selected_industry_id" not in st.session_state:
     st.session_state.selected_industry_id = None
 if "sidebar_industry_select" not in st.session_state:
     st.session_state.sidebar_industry_select = None
+if "preselected_cluster" not in st.session_state:
+    st.session_state.preselected_cluster = None
+
+
+def navigate_to_landing():
+    st.session_state.current_view = "landing"
+    st.session_state.preselected_cluster = None
+    st.session_state._sync_sidebar = True
+
+
+def navigate_to_directory(cluster_filter=None):
+    st.session_state.current_view = "directory"
+    st.session_state.preselected_cluster = cluster_filter
+    st.session_state._sync_sidebar = True
 
 
 def navigate_to_industry(industry_id: int):
@@ -982,22 +1139,42 @@ def navigate_to_industry(industry_id: int):
     st.session_state._sync_sidebar = True
 
 
-def navigate_to_directory():
-    st.session_state.current_view = "directory"
-    st.session_state._sync_sidebar = True
-
-
 # Load all industries for navigation & dashboard
 all_industries = db.get_all_industries()
 industry_map = {ind["id"]: ind for ind in all_industries}
+total_ind = len(all_industries)
+visited_cnt = sum(1 for i in all_industries if i["status"] == "Visited")
+scheduled_cnt = sum(1 for i in all_industries if i["status"] == "Scheduled")
+contacted_cnt = sum(1 for i in all_industries if i["status"] == "Contacted")
+total_machines_all = sum(i["machine_count"] for i in all_industries)
+total_contacts_all = sum(i["contact_count"] for i in all_industries)
+total_updates_all = sum(i["update_count"] for i in all_industries)
+profiled_industries = sorted(
+    [i for i in all_industries if i["machine_count"] > 0],
+    key=lambda x: -x["machine_count"],
+)
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.title("🏭 Knit Industry CRM")
-    st.caption("Dedicated Factory Profiles, Machine Profiles, Contacts & Visit Logs")
+    st.markdown(
+        '<div style="padding:0.4rem 0 0.8rem 0;">'
+        '<div style="font-size:0.72rem;font-weight:700;letter-spacing:1.2px;color:#60a5fa;text-transform:uppercase;">Textile Intelligence</div>'
+        '<div style="font-size:1.45rem;font-weight:800;color:#f8fafc;margin-top:2px;">🏭 Knit Industry CRM</div>'
+        '<div style="font-size:0.8rem;color:#94a3b8;margin-top:2px;">Factory Profiles • Machinery • Visit Logs</div>'
+        "</div>",
+        unsafe_allow_html=True,
+    )
 
     if st.button(
-        "🏠 All Industries Directory",
+        "✨ Executive Landing Page",
+        use_container_width=True,
+        type="primary" if st.session_state.current_view == "landing" else "secondary",
+    ):
+        navigate_to_landing()
+        st.rerun()
+
+    if st.button(
+        f"🏭 Industries Section ({total_ind})",
         use_container_width=True,
         type="primary" if st.session_state.current_view == "directory" else "secondary",
     ):
@@ -1005,7 +1182,7 @@ with st.sidebar:
         st.rerun()
 
     st.divider()
-    st.subheader("🔍 Jump to Industry Webpage")
+    st.caption("🔍 QUICK JUMP TO INDUSTRY PAGE")
 
     industry_options = {
         ind["id"]: f"{ind['name']} ({ind['machine_count']} M | {ind['status']})" for ind in all_industries
@@ -1024,6 +1201,7 @@ with st.sidebar:
         options=[None] + list(industry_options.keys()),
         format_func=lambda x: "— Choose an Industry —" if x is None else industry_options[x],
         key="sidebar_industry_select",
+        label_visibility="collapsed",
     )
 
     if selected_jump is not None and (
@@ -1087,47 +1265,262 @@ with st.sidebar:
 
 
 # ==============================================================================
-# VIEW 1: ALL INDUSTRIES DIRECTORY (DASHBOARD)
+# TIER 1: EXECUTIVE LANDING PAGE
 # ==============================================================================
-if st.session_state.current_view == "directory" or st.session_state.selected_industry_id not in industry_map:
-    st.title("🏠 Knit Industry Directory & CRM Dashboard")
+if st.session_state.current_view == "landing":
     st.markdown(
-        "Select any factory below to open its **dedicated webpage** containing its **Machine Profile (with automatic Needle & Sinker calculations)**, **Contacts**, and **Visit Updates / Meeting Minutes**."
+        f'<div class="landing-hero">'
+        f'<div class="hero-eyebrow">⚡ Bangladesh Knitwear &amp; Textile CRM Intelligence</div>'
+        f'<h1 class="hero-title">Knit Industry Machinery &amp; Relationship Hub</h1>'
+        f'<p class="hero-subtitle">'
+        f'Centralized executive portal tracking <strong>{total_ind} knit composite factories</strong>, '
+        f'<strong>{total_machines_all:,} circular &amp; flat-knit machines</strong> across <strong>{len(profiled_industries)} deep-profiled plants</strong>, '
+        f'<strong>{total_contacts_all} key decision makers</strong>, and field visit meeting minutes.'
+        f"</p>"
+        f"</div>",
+        unsafe_allow_html=True,
     )
 
-    # KPI Row
-    total_ind = len(all_industries)
-    visited_cnt = sum(1 for i in all_industries if i["status"] == "Visited")
-    scheduled_cnt = sum(1 for i in all_industries if i["status"] == "Scheduled")
-    total_machines_all = sum(i["machine_count"] for i in all_industries)
-    total_contacts = sum(i["contact_count"] for i in all_industries)
-    total_updates = sum(i["update_count"] for i in all_industries)
+    cta_c1, cta_c2, cta_c3 = st.columns([2.2, 2.2, 3.6])
+    with cta_c1:
+        if st.button("🚀 Explore All Industries Section →", type="primary", use_container_width=True):
+            navigate_to_directory()
+            st.rerun()
+    with cta_c2:
+        if st.button("Visited Factories Directory →", use_container_width=True):
+            st.session_state.preselected_status = "Visited"
+            navigate_to_directory()
+            st.rerun()
 
-    k1, k2, k3, k4, k5, k6 = st.columns(6)
-    k1.metric("Total Factories", total_ind)
-    k2.metric("Visited", visited_cnt)
-    k3.metric("Scheduled", scheduled_cnt)
-    k4.metric("Logged Machines", total_machines_all)
-    k5.metric("Total Contacts", total_contacts)
-    k6.metric("Visit Logs / Minutes", total_updates)
+    # 4 Glassmorphic Executive KPI Cards
+    clusters_set = sorted(list({i["cluster"] for i in all_industries if i["cluster"]}))
+    k1, k2, k3, k4 = st.columns(4)
+    with k1:
+        st.markdown(
+            f'<div class="kpi-card">'
+            f'<div class="kpi-icon">🏭</div>'
+            f'<div class="kpi-value">{total_ind}</div>'
+            f'<div class="kpi-label">Partner &amp; Target Factories</div>'
+            f'<div class="kpi-sub">100% Geo-Mapped Across {len(clusters_set)} Clusters</div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+    with k2:
+        st.markdown(
+            f'<div class="kpi-card">'
+            f'<div class="kpi-icon">⚙️</div>'
+            f'<div class="kpi-value">{total_machines_all:,}</div>'
+            f'<div class="kpi-label">Logged Knitting Machines</div>'
+            f'<div class="kpi-sub">Across {len(profiled_industries)} Full Machine Profile Sheets</div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+    with k3:
+        st.markdown(
+            f'<div class="kpi-card">'
+            f'<div class="kpi-icon">👥</div>'
+            f'<div class="kpi-value">{total_contacts_all}</div>'
+            f'<div class="kpi-label">Verified Factory Contacts</div>'
+            f'<div class="kpi-sub">GMs, AGMs, Supply Chain &amp; BUTEX Alumni</div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+    with k4:
+        st.markdown(
+            f'<div class="kpi-card">'
+            f'<div class="kpi-icon">📈</div>'
+            f'<div class="kpi-value">{visited_cnt + contacted_cnt + scheduled_cnt}</div>'
+            f'<div class="kpi-label">Active Pipeline Factories</div>'
+            f'<div class="kpi-sub">{visited_cnt} Visited • {contacted_cnt} Contacted • {scheduled_cnt} Scheduled</div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
 
-    st.divider()
+    # Featured Factories with Full Machine Profiles
+    st.markdown(
+        '<div class="section-banner">'
+        '<div><span style="font-size:1.15rem;font-weight:800;color:#f8fafc;">⚙️ Featured Factories with Complete Machine Profiles</span>'
+        '<div style="font-size:0.82rem;color:#94a3b8;">Click any factory below to open its dedicated page and view its complete machinery breakdown</div></div>'
+        f'<span class="status-badge status-Visited">{len(profiled_industries)} Profiled Plants • {total_machines_all:,} Machines</span>'
+        "</div>",
+        unsafe_allow_html=True,
+    )
 
-    # Filters
-    f_col1, f_col2, f_col3, f_col4 = st.columns([3, 2, 2, 1.5])
+    p_cols = st.columns(3)
+    for idx, p_ind in enumerate(profiled_industries):
+        with p_cols[idx % 3]:
+            with st.container(border=True):
+                loc_str = ", ".join([p for p in [p_ind["location_area"], p_ind["cluster"]] if p]) or "Bangladesh"
+                dist_str = f" • {p_ind['distance_km']} km" if p_ind["distance_km"] else ""
+                st.markdown(
+                    f'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">'
+                    f'<div class="factory-card-title">{html.escape(p_ind["name"])}</div>'
+                    f'{status_badge_html(p_ind["status"])}'
+                    f"</div>"
+                    f'<div class="factory-card-loc">📍 {html.escape(loc_str)}{dist_str}</div>'
+                    f'<div class="stat-chip-row">'
+                    f'<span class="stat-chip stat-chip-highlight">⚙️ {p_ind["machine_count"]} Machines</span>'
+                    f'<span class="stat-chip">👥 {p_ind["contact_count"]} Contacts</span>'
+                    f'<span class="stat-chip">📝 {p_ind["update_count"]} Visits</span>'
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
+                bc1, bc2 = st.columns([2.2, 1])
+                with bc1:
+                    if st.button(
+                        "Open Factory Page →",
+                        key=f"landing_prof_{p_ind['id']}",
+                        use_container_width=True,
+                        type="primary",
+                    ):
+                        navigate_to_industry(p_ind["id"])
+                        st.rerun()
+                with bc2:
+                    if p_ind["map_url"]:
+                        st.link_button("🗺️ Map", p_ind["map_url"], use_container_width=True)
+
+    # Explore by Industrial Cluster & Pipeline Status
+    cl_col, pipe_col = st.columns([1.65, 1.35])
+
+    with cl_col:
+        st.markdown(
+            '<div class="section-banner">'
+            '<div><span style="font-size:1.1rem;font-weight:800;color:#f8fafc;">📍 Explore by Industrial Cluster</span>'
+            '<div style="font-size:0.8rem;color:#94a3b8;">Filter the industry section by geographic manufacturing zone</div></div>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
+        cluster_stats = defaultdict(lambda: {"count": 0, "machines": 0, "contacts": 0, "visited": 0})
+        for ind in all_industries:
+            c_name = ind["cluster"] or "Other"
+            cluster_stats[c_name]["count"] += 1
+            cluster_stats[c_name]["machines"] += ind["machine_count"]
+            cluster_stats[c_name]["contacts"] += ind["contact_count"]
+            if ind["status"] == "Visited":
+                cluster_stats[c_name]["visited"] += 1
+
+        c_grid = st.columns(2)
+        for c_idx, (c_name, c_data) in enumerate(
+            sorted(cluster_stats.items(), key=lambda x: (-x[1]["count"], x[0]))
+        ):
+            with c_grid[c_idx % 2]:
+                with st.container(border=True):
+                    st.markdown(
+                        f'<div style="display:flex;justify-content:space-between;align-items:center;">'
+                        f'<span style="font-size:1.05rem;font-weight:800;color:#f8fafc;">📍 {html.escape(c_name)}</span>'
+                        f'<span class="stat-chip stat-chip-highlight">{c_data["count"]} Factories</span>'
+                        f"</div>"
+                        f'<div style="font-size:0.8rem;color:#94a3b8;margin:6px 0 8px 0;">'
+                        f'⚙️ <strong>{c_data["machines"]}</strong> Mach. • 👥 <strong>{c_data["contacts"]}</strong> Contacts • ✅ <strong>{c_data["visited"]}</strong> Visited'
+                        f"</div>",
+                        unsafe_allow_html=True,
+                    )
+                    if st.button(f"View {c_name} Factories →", key=f"cluster_btn_{c_name}", use_container_width=True):
+                        navigate_to_directory(cluster_filter=c_name)
+                        st.rerun()
+
+    with pipe_col:
+        st.markdown(
+            '<div class="section-banner">'
+            '<div><span style="font-size:1.1rem;font-weight:800;color:#f8fafc;">📊 CRM Outreach Pipeline</span>'
+            '<div style="font-size:0.8rem;color:#94a3b8;">Current relationship status across all 32 factories</div></div>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
+        status_counts = defaultdict(int)
+        for ind in all_industries:
+            status_counts[ind["status"]] += 1
+
+        status_colors = {
+            "Visited": "#10b981",
+            "Follow-up": "#a855f7",
+            "Scheduled": "#3b82f6",
+            "Contacted": "#f59e0b",
+            "Active Client": "#22c55e",
+            "New": "#64748b",
+        }
+        with st.container(border=True):
+            for st_name in ["Visited", "Follow-up", "Scheduled", "Contacted", "New"]:
+                cnt = status_counts.get(st_name, 0)
+                pct = int(round((cnt / total_ind) * 100)) if total_ind else 0
+                bar_col = status_colors.get(st_name, "#3b82f6")
+                st.markdown(
+                    f'<div style="margin-bottom:14px;">'
+                    f'<div style="display:flex;justify-content:space-between;font-size:0.86rem;font-weight:700;margin-bottom:5px;">'
+                    f"<span>{html.escape(st_name)}</span>"
+                    f'<span style="color:#94a3b8;">{cnt} Factories ({pct}%)</span>'
+                    f"</div>"
+                    f'<div style="width:100%;height:9px;background:rgba(148,163,184,0.15);border-radius:999px;overflow:hidden;">'
+                    f'<div style="width:{max(pct, 3)}%;height:100%;background:{bar_col};border-radius:999px;"></div>'
+                    f"</div>"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
+            if st.button("Open Full Industries Directory →", use_container_width=True, type="primary"):
+                navigate_to_directory()
+                st.rerun()
+
+
+# ==============================================================================
+# TIER 2: ALL INDUSTRIES DIRECTORY SECTION
+# ==============================================================================
+elif st.session_state.current_view == "directory" or st.session_state.selected_industry_id not in industry_map:
+    # Breadcrumb back to Landing Page
+    b_col1, b_col2 = st.columns([1.8, 6.2])
+    with b_col1:
+        if st.button("← ✨ Landing Page", use_container_width=True):
+            navigate_to_landing()
+            st.rerun()
+
+    st.markdown(
+        f'<div class="industry-header-box" style="padding:1.3rem 1.7rem;">'
+        f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">'
+        f"<div>"
+        f'<div style="font-size:0.75rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:1px;">Directory &amp; Search</div>'
+        f'<h2 style="margin:2px 0 4px 0;font-size:1.75rem;font-weight:800;color:#f8fafc;">🏭 Knit Industries Section</h2>'
+        f'<div style="font-size:0.88rem;color:#94a3b8;">Browse, filter, and open dedicated webpages for all <strong>{total_ind}</strong> knitting factories.</div>'
+        f"</div>"
+        f'<div class="stat-chip-row">'
+        f'<span class="stat-chip stat-chip-highlight">🏭 {total_ind} Factories</span>'
+        f'<span class="stat-chip">⚙️ {total_machines_all:,} Machines</span>'
+        f'<span class="stat-chip">👥 {total_contacts_all} Contacts</span>'
+        f'<span class="stat-chip">✅ {visited_cnt} Visited</span>'
+        f"</div>"
+        f"</div>"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+    # Filter & Sort Bar
+    f_col1, f_col2, f_col3, f_col4, f_col5 = st.columns([2.5, 1.8, 1.8, 1.6, 1.2])
     with f_col1:
         search_q = st.text_input(
-            "🔎 Search by Factory Name or Location",
-            placeholder="e.g. L'Esquire, Fakir, MASCO, Square, Mawna...",
+            "🔎 Search Factory or Location",
+            placeholder="e.g. MASCO, Fakir, L'Esquire, Tosrifa, Mawna...",
         )
     with f_col2:
         clusters = sorted(list({i["cluster"] for i in all_industries if i["cluster"]}))
-        selected_clusters = st.multiselect("📍 Filter by Cluster", options=clusters)
+        default_clusters = (
+            [st.session_state.preselected_cluster]
+            if st.session_state.get("preselected_cluster") in clusters
+            else []
+        )
+        selected_clusters = st.multiselect("📍 Cluster", options=clusters, default=default_clusters)
     with f_col3:
         statuses = sorted(list({i["status"] for i in all_industries if i["status"]}))
-        selected_statuses = st.multiselect("🏷️ Filter by Status", options=statuses)
+        default_st = (
+            [st.session_state.preselected_status]
+            if st.session_state.get("preselected_status") in statuses
+            else []
+        )
+        selected_statuses = st.multiselect("🏷️ Status", options=statuses, default=default_st)
     with f_col4:
-        view_mode = st.radio("Layout", ["Cards", "Table"], horizontal=True)
+        sort_by = st.selectbox(
+            "↕️ Sort By",
+            ["Most Machines First", "Factory Name (A–Z)", "Distance (Nearest First)", "Most Contacts First"],
+        )
+    with f_col5:
+        view_mode = st.radio("View", ["Cards", "Table"], horizontal=True)
 
     filtered_industries = []
     for ind in all_industries:
@@ -1145,6 +1538,15 @@ if st.session_state.current_view == "directory" or st.session_state.selected_ind
             continue
         filtered_industries.append(ind)
 
+    if sort_by == "Most Machines First":
+        filtered_industries.sort(key=lambda x: (-x["machine_count"], -x["contact_count"], x["name"]))
+    elif sort_by == "Distance (Nearest First)":
+        filtered_industries.sort(key=lambda x: (x["distance_km"] if x["distance_km"] is not None else 9999, x["name"]))
+    elif sort_by == "Most Contacts First":
+        filtered_industries.sort(key=lambda x: (-x["contact_count"], -x["machine_count"], x["name"]))
+    else:
+        filtered_industries.sort(key=lambda x: x["name"])
+
     st.caption(f"Showing **{len(filtered_industries)}** of **{total_ind}** industries")
 
     if view_mode == "Cards":
@@ -1154,31 +1556,31 @@ if st.session_state.current_view == "directory" or st.session_state.selected_ind
             for col_idx, ind in enumerate(filtered_industries[idx : idx + cols_per_row]):
                 with cols[col_idx]:
                     with st.container(border=True):
-                        top_c1, top_c2 = st.columns([3, 1.3])
-                        with top_c1:
-                            st.markdown(f"#### {ind['name']}")
-                        with top_c2:
-                            st.markdown(status_badge_html(ind["status"]), unsafe_allow_html=True)
-
                         loc_parts = [p for p in [ind["location_area"], ind["cluster"]] if p]
                         loc_str = ", ".join(loc_parts) if loc_parts else "Location not set"
                         dist_str = f" • {ind['distance_km']} km" if ind["distance_km"] else ""
-                        st.caption(f"📍 {loc_str}{dist_str}")
+                        mach_chip_cls = "stat-chip stat-chip-highlight" if ind["machine_count"] > 0 else "stat-chip"
+                        visit_txt = f"🕒 Last Visit: {ind['last_visit_date']}" if ind["last_visit_date"] else "🕒 No visits logged yet"
 
-                        m1, m2, m3 = st.columns(3)
-                        m1.markdown(f"⚙️ **{ind['machine_count']}** Mach.")
-                        m2.markdown(f"👥 **{ind['contact_count']}** Contacts")
-                        m3.markdown(f"📝 **{ind['update_count']}** Visits")
+                        st.markdown(
+                            f'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">'
+                            f'<div class="factory-card-title">{html.escape(ind["name"])}</div>'
+                            f'{status_badge_html(ind["status"])}'
+                            f"</div>"
+                            f'<div class="factory-card-loc">📍 {html.escape(loc_str)}{dist_str}</div>'
+                            f'<div class="stat-chip-row">'
+                            f'<span class="{mach_chip_cls}">⚙️ {ind["machine_count"]} Mach.</span>'
+                            f'<span class="stat-chip">👥 {ind["contact_count"]} Contacts</span>'
+                            f'<span class="stat-chip">📝 {ind["update_count"]} Visits</span>'
+                            f"</div>"
+                            f'<div style="font-size:0.75rem;color:#64748b;margin:6px 0 8px 0;">{html.escape(visit_txt)}</div>',
+                            unsafe_allow_html=True,
+                        )
 
-                        if ind["last_visit_date"]:
-                            st.caption(f"🕒 Last Visit: **{ind['last_visit_date']}**")
-                        else:
-                            st.caption("🕒 No visits logged yet")
-
-                        btn_c1, btn_c2 = st.columns([2, 1])
+                        btn_c1, btn_c2 = st.columns([2.2, 1])
                         with btn_c1:
                             if st.button(
-                                "Open Webpage →",
+                                "Open Industry Page →",
                                 key=f"open_ind_{ind['id']}",
                                 use_container_width=True,
                                 type="primary",
@@ -1218,7 +1620,7 @@ if st.session_state.current_view == "directory" or st.session_state.selected_ind
 
 
 # ==============================================================================
-# VIEW 2: DEDICATED INDUSTRY WEBPAGE
+# TIER 3: DEDICATED INDUSTRY WEBPAGE
 # ==============================================================================
 else:
     industry_id = st.session_state.selected_industry_id
@@ -1228,22 +1630,38 @@ else:
     machines = db.get_machines(industry_id)
     total_mach_units = sum(m["quantity"] or 0 for m in machines)
 
-    # Top Breadcrumb
-    nav_c1, _ = st.columns([1.5, 6])
+    # Top Breadcrumb Bar (Landing Page -> Industries Section -> Current Factory)
+    nav_c1, nav_c2, _ = st.columns([1.5, 1.7, 4.8])
     with nav_c1:
-        if st.button("← Back to Directory", use_container_width=True):
+        if st.button("✨ Landing Page", use_container_width=True):
+            navigate_to_landing()
+            st.rerun()
+    with nav_c2:
+        if st.button("← 🏭 Industries Section", use_container_width=True):
             navigate_to_directory()
             st.rerun()
 
     # Dedicated Industry Header Box
+    loc_bits = [b for b in [industry["location_area"], industry["cluster"]] if b]
+    loc_display = ", ".join(loc_bits) if loc_bits else "Location not specified"
+    dist_display = f" • {industry['distance_km']} km from Dhaka" if industry["distance_km"] else ""
+
     st.markdown('<div class="industry-header-box">', unsafe_allow_html=True)
-    h_col1, h_col2 = st.columns([3.5, 1.5])
+    h_col1, h_col2 = st.columns([3.6, 1.4])
     with h_col1:
-        st.markdown(f"# 🏭 {industry['name']}")
-        loc_bits = [b for b in [industry["location_area"], industry["cluster"]] if b]
-        loc_display = ", ".join(loc_bits) if loc_bits else "Location not specified"
-        dist_display = f" • **{industry['distance_km']} km** from Dhaka" if industry["distance_km"] else ""
-        st.markdown(f"📍 **Location:** {loc_display}{dist_display}")
+        st.markdown(
+            f'<div style="font-size:0.75rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:1.1px;margin-bottom:4px;">'
+            f'Dedicated Industry Profile • {html.escape(industry["cluster"] or "Bangladesh")}'
+            f"</div>"
+            f'<h1 style="margin:0 0 8px 0;font-size:2.1rem;font-weight:800;color:#f8fafc;">🏭 {html.escape(industry["name"])}</h1>'
+            f'<div style="font-size:0.95rem;color:#cbd5e1;margin-bottom:12px;">📍 <strong>Location:</strong> {html.escape(loc_display)}{html.escape(dist_display)}</div>'
+            f'<div class="stat-chip-row">'
+            f'<span class="stat-chip stat-chip-highlight">⚙️ {total_mach_units} Total Machines</span>'
+            f'<span class="stat-chip">👥 {len(contacts)} Key Contacts</span>'
+            f'<span class="stat-chip">📝 {len(updates)} Visit Logs</span>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
         if industry["general_notes"]:
             st.info(f"📌 **Overview Notes:** {industry['general_notes']}")
 
