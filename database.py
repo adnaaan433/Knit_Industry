@@ -208,6 +208,9 @@ def init_db():
     # Seed Renaissance Apparels Ltd. machine profile if empty
     seed_renaissance_machines(conn)
 
+    # Seed Adury Knit Composite machine profile if empty
+    seed_adury_machines(conn)
+
     conn.close()
 
 
@@ -816,6 +819,39 @@ def seed_renaissance_machines(conn):
         ("Flat Knit Machine", 80, 14, "80x14", "MATSUYA", 12),
     ]
     for fab, dia, gauge, lbl, brand, qty in renaissance_rows:
+        cur.execute(
+            """
+            INSERT INTO machine_profiles (
+                industry_id, fabrication, dia, gauge, dia_gauge_label, brand, quantity,
+                needles_per_machine, sinkers_per_machine
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+            """,
+            (ind_id, fab, dia, gauge, lbl, brand, qty),
+        )
+    conn.commit()
+
+
+def seed_adury_machines(conn):
+    """Seed Adury Knit Composite knitting machines (63 Circular + 42 Flat Knit = 105) into machine_profiles."""
+    cur = conn.cursor()
+    row = cur.execute("SELECT id FROM industries WHERE name LIKE '%Adury%' LIMIT 1").fetchone()
+    if not row:
+        return
+    ind_id = row["id"]
+
+    cnt = cur.execute("SELECT COUNT(*) as c FROM machine_profiles WHERE industry_id = ?", (ind_id,)).fetchone()["c"]
+    if cnt > 0:
+        return
+
+    adury_rows = [
+        ("Single Jersey (Open)", 33, 24, "30\"–36\" x 24G", "With FF Lycra Attachments", 4),
+        ("Single Jersey (Tube)", 32, 24, "25\"–40\" x 14G–28G", "With FF Lycra Attachments", 29),
+        ("Rib & Interlock", 35, 18, "30\"–40\" x 18G–24G", "With Interlock conversion Facilities", 8),
+        ("Fleece", 32, 20, "30\"–34\" x 20G", "With Lycra Attachments", 17),
+        ("Engineering Stripe S/J", 34, 20, "30\"–38\" x 14G/20G/24G", "6 Finger Auto Stripe", 5),
+        ("Collar & Cuff (Flat Knit)", 60, 14, "45\"–80\" x 14G", "Semi Jacquard & Jacquard", 42),
+    ]
+    for fab, dia, gauge, lbl, brand, qty in adury_rows:
         cur.execute(
             """
             INSERT INTO machine_profiles (

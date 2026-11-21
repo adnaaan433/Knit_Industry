@@ -414,6 +414,193 @@ def render_renaissance_profile_html() -> str:
     return "".join(blocks_html)
 
 
+def render_adury_profile_html() -> str:
+    """Render Adury Knit Composite Ltd. Knitting Machine Profile matching AKCL MC Profile.pdf."""
+    def _std_section(title: str, rows: list, total_row: list) -> str:
+        parts = [
+            f'<tr><td colspan="11" style="background-color:#f8cbad;color:#0f172a;font-weight:800;text-align:left;font-size:0.95rem;padding:6px 10px;border:1px solid #0f172a;">{html.escape(title)}</td></tr>',
+            "<tr>"
+            '<th rowspan="2" style="background-color:#8ea9db;border:1px solid #0f172a;width:8%;">Dia</th>'
+            '<th rowspan="2" style="background-color:#8ea9db;border:1px solid #0f172a;width:8%;">Feeder</th>'
+            '<th rowspan="2" style="background-color:#8ea9db;border:1px solid #0f172a;width:9%;">M/C Qty</th>'
+            '<th colspan="7" style="background-color:#8ea9db;border:1px solid #0f172a;width:45%;">Cylinder</th>'
+            '<th rowspan="2" style="background-color:#8ea9db;border:1px solid #0f172a;width:30%;">Remarks</th>'
+            "</tr>",
+            "<tr>"
+            '<th style="background-color:#8ea9db;border:1px solid #0f172a;">14G</th>'
+            '<th style="background-color:#8ea9db;border:1px solid #0f172a;">18G</th>'
+            '<th style="background-color:#8ea9db;border:1px solid #0f172a;">20G</th>'
+            '<th style="background-color:#8ea9db;border:1px solid #0f172a;">22G</th>'
+            '<th style="background-color:#8ea9db;border:1px solid #0f172a;">24G</th>'
+            '<th style="background-color:#8ea9db;border:1px solid #0f172a;">25G</th>'
+            '<th style="background-color:#8ea9db;border:1px solid #0f172a;">28G</th>'
+            "</tr>",
+        ]
+        for r in rows:
+            dia, dia_span, feeder, qty, g14, g18, g20, g22, g24, g25, g28, rem = r
+            tr = ["<tr>"]
+            if dia_span > 0:
+                tr.append(f'<td class="total-col" rowspan="{dia_span}"><strong>{html.escape(str(dia))}</strong></td>')
+            tr.append(f'<td class="total-col">{html.escape(str(feeder))}</td>')
+            tr.append(f'<td class="total-col"><strong>{html.escape(str(qty))}</strong></td>')
+            for gval in (g14, g18, g20, g22, g24, g25, g28):
+                tr.append(f'<td class="total-col">{html.escape(str(gval))}</td>')
+            tr.append(f'<td class="total-col">{html.escape(str(rem))}</td>')
+            tr.append("</tr>")
+            parts.append("".join(tr))
+
+        t_cells = "".join(
+            f'<td class="total-col" style="background-color:#8ea9db;font-weight:800;">{v}</td>' for v in total_row
+        )
+        parts.append(
+            f'<tr class="sheet-subtotal-row">'
+            f'<td colspan="2" style="text-align:right;background-color:#8ea9db;font-weight:800;">Total =</td>'
+            f"{t_cells}"
+            f'<td style="background-color:#8ea9db;"></td>'
+            f"</tr>"
+        )
+        return "".join(parts)
+
+    sj_open_rows = [
+        ('30"', 1, 96, 1, "", "", "", "", 1, "", "", "With FF Lycra Attachments"),
+        ('32"', 1, 102, 1, "", "", "", "", 1, "", "", "With FF Lycra Attachments"),
+        ('34"', 1, 109, 1, "", "", "", "", 1, "", "", "With FF Lycra Attachments"),
+        ('36"', 1, 115, 1, "", "", "", "", 1, "", "", "With FF Lycra Attachments"),
+    ]
+    sj_tube_rows = [
+        ('25"', 1, 75, 1, "", "", "", "", 1, "", "", "With FF Lycra Attachments"),
+        ('26"', 1, 84, 1, "", "", "", "", 1, "", 1, "With FF Lycra Attachments"),
+        ('28"', 1, 84, 1, "", "", "", "", 1, "", "", "With FF Lycra Attachments"),
+        ('30"', 1, 96, 5, "", "", 2, "", 5, "", 3, "With FF Lycra Attachments"),
+        ('32"', 1, 102, 5, "", "", 1, "", 5, "", 2, "With FF Lycra Attachments"),
+        ('34"', 1, 108, 6, 1, "", 1, "", 6, "", 2, "With FF Lycra Attachments"),
+        ('36"', 1, 108, 7, 2, "", 3, "", 7, "", 1, "With FF Lycra Attachments"),
+        ('38"', 1, 108, 1, "", "", "", "", 1, "", "", "With FF Lycra Attachments"),
+        ('40"', 1, 128, 2, 1, "", "", "", 2, "", "", "With FF Lycra Attachments"),
+    ]
+    rib_il_rows = [
+        ('30"', 1, 60, 1, "", 1, "", "", 1, "", "", "With Interlock conversion Facilities"),
+        ('32"', 1, 66, 1, "", 1, "", 1, 1, "", "", "With Interlock conversion Facilities"),
+        ('34"', 2, 70, 1, "", 1, "", "", 1, "", "", "With Interlock conversion Facilities"),
+        (None, 0, 62, 1, "", 1, "", "", 1, "", "", "With Interlock conversion Facilities"),
+        ('36"', 2, 74, 1, "", 1, "", "", 1, "", "", "With Interlock conversion Facilities"),
+        (None, 0, 64, 1, "", 1, "", "", 1, "", "", "With Interlock conversion Facilities"),
+        ('38"', 1, 78, 1, "", 1, "", "", 1, "", "", "With Interlock conversion Facilities"),
+        ('40"', 1, 72, 1, "", 1, "", "", 1, "", "", "With Interlock conversion Facilities"),
+    ]
+    fleece_rows = [
+        ("30", 1, 90, 5, "", "", 5, "", "", "", "", "With Lycra Attachments"),
+        ("32", 1, 96, 2, "", "", 2, "", "", "", "", ""),
+        ("34", 1, 108, 10, "", "", 10, "", "", "", "", ""),
+    ]
+
+    sec1 = _std_section("Single Jersey (Open)", sj_open_rows, [4, 0, 0, 0, 0, 4, 0, 0])
+    sec2 = _std_section("Single Jersey (Tube)", sj_tube_rows, [29, 4, 0, 7, 0, 29, 0, 9])
+    sec3 = _std_section("Rib & Interlock", rib_il_rows, [8, 0, 8, 0, 1, 8, 0, 0])
+    sec4 = _std_section("Fleece", fleece_rows, [17, 0, 0, 17, 0, 0, 0, 0])
+
+    # Engineering Stripe S/J section (has 'Finger' column and 6 Cylinder columns: 14G..25G)
+    eng_rows_data = [
+        ("30", 48, 6, 1, 1, "", 1, "", 1, "", ""),
+        ("32", 54, 6, 1, 1, "", 1, "", 1, "", ""),
+        ("34", 54, 6, 1, 1, "", 1, "", 1, "", ""),
+        ("36", 54, 6, 1, 1, "", 1, "", 1, "", ""),
+        ("38", 54, 6, 1, 1, "", 1, "", 1, "", ""),
+    ]
+    eng_parts = [
+        '<tr><td colspan="11" style="background-color:#f8cbad;color:#0f172a;font-weight:800;text-align:left;font-size:0.95rem;padding:6px 10px;border:1px solid #0f172a;">Engineering Stripe S/J</td></tr>',
+        "<tr>"
+        '<th rowspan="2" style="background-color:#8ea9db;border:1px solid #0f172a;">Dia</th>'
+        '<th rowspan="2" style="background-color:#8ea9db;border:1px solid #0f172a;">Feeder</th>'
+        '<th rowspan="2" style="background-color:#8ea9db;border:1px solid #0f172a;">Finger</th>'
+        '<th rowspan="2" style="background-color:#8ea9db;border:1px solid #0f172a;">M/C Qty</th>'
+        '<th colspan="6" style="background-color:#8ea9db;border:1px solid #0f172a;">Cylinder</th>'
+        '<th rowspan="2" style="background-color:#8ea9db;border:1px solid #0f172a;">Remarks</th>'
+        "</tr>",
+        "<tr>"
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">14G</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">18G</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">20G</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">22G</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">24G</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">25G</th>'
+        "</tr>",
+    ]
+    for dia, fd, fg, mq, c14, c18, c20, c22, c24, c25, rem in eng_rows_data:
+        eng_parts.append(
+            f"<tr>"
+            f'<td class="total-col"><strong>{dia}</strong></td>'
+            f'<td class="total-col">{fd}</td>'
+            f'<td class="total-col"><strong>{fg}</strong></td>'
+            f'<td class="total-col"><strong>{mq}</strong></td>'
+            f'<td class="total-col">{c14}</td>'
+            f'<td class="total-col">{c18}</td>'
+            f'<td class="total-col">{c20}</td>'
+            f'<td class="total-col">{c22}</td>'
+            f'<td class="total-col">{c24}</td>'
+            f'<td class="total-col">{c25}</td>'
+            f'<td class="total-col">{rem}</td>'
+            f"</tr>"
+        )
+    eng_t_cells = "".join(
+        f'<td class="total-col" style="background-color:#8ea9db;font-weight:800;">{v}</td>' for v in [5, 5, 0, 5, 0, 5, 0]
+    )
+    eng_parts.append(
+        f'<tr class="sheet-subtotal-row">'
+        f'<td colspan="3" style="text-align:right;background-color:#8ea9db;font-weight:800;">Total =</td>'
+        f"{eng_t_cells}"
+        f'<td style="background-color:#8ea9db;"></td>'
+        f"</tr>"
+    )
+    sec5 = "".join(eng_parts)
+
+    # Collar & Cuff + Total M/C Summary Box
+    collar_table = (
+        '<table class="mp-sheet-table" style="font-size:0.86rem;">'
+        "<tbody>"
+        '<tr><td colspan="6" style="background-color:#f8cbad;color:#0f172a;font-weight:800;text-align:left;font-size:0.95rem;padding:6px 10px;border:1px solid #0f172a;">Collar &amp; Cuff</td></tr>'
+        "<tr>"
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">Bed</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">Qty</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">Color Use</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">GG</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">Needle</th>'
+        '<th style="background-color:#8ea9db;border:1px solid #0f172a;">Remark\'s</th>'
+        "</tr>"
+        '<tr><td colspan="6" style="background-color:#f8cbad;color:#0f172a;font-weight:800;text-align:center;padding:4px;border:1px solid #0f172a;">Semi Jacquard</td></tr>'
+        '<tr><td class="total-col">60"</td><td class="total-col"><strong>37</strong></td><td class="total-col">4</td><td class="total-col">14</td><td class="total-col"><strong>840X2</strong></td><td class="total-col"></td></tr>'
+        '<tr><td colspan="6" style="background-color:#f8cbad;color:#0f172a;font-weight:800;text-align:center;padding:4px;border:1px solid #0f172a;">Jacquard</td></tr>'
+        '<tr><td class="total-col">45"</td><td class="total-col"><strong>2</strong></td><td class="total-col">4</td><td class="total-col">14</td><td class="total-col"><strong>630X2</strong></td><td class="total-col"></td></tr>'
+        '<tr><td class="total-col">80"</td><td class="total-col"><strong>3</strong></td><td class="total-col">6</td><td class="total-col">14</td><td class="total-col"><strong>1120X2</strong></td><td class="total-col"></td></tr>'
+        '<tr class="sheet-subtotal-row">'
+        '<td style="background-color:#8ea9db;font-weight:800;text-align:center;">Total =</td>'
+        '<td class="total-col" style="background-color:#8ea9db;font-weight:800;">42</td>'
+        '<td colspan="4" style="background-color:#8ea9db;"></td>'
+        "</tr>"
+        "</tbody></table>"
+    )
+
+    summary_box = (
+        '<div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;padding:24px;border:1.5px solid #1e293b;background:#ffffff;color:#0f172a;text-align:center;">'
+        '<div style="font-size:1.6rem;font-weight:800;margin-bottom:10px;font-family:Georgia,serif;">Total M/C</div>'
+        '<div style="font-size:1.25rem;font-weight:700;margin-bottom:8px;font-family:Georgia,serif;">Circular Knit : 63</div>'
+        '<div style="font-size:1.25rem;font-weight:700;font-family:Georgia,serif;">Flat Knit : 42</div>'
+        "</div>"
+    )
+
+    return (
+        f'<div class="mp-sheet-container" style="max-width:980px;margin-bottom:0.85rem;">'
+        f'<table class="mp-sheet-table" style="font-size:0.85rem;">'
+        f"<tbody>{sec1}{sec2}{sec3}{sec4}{sec5}</tbody>"
+        f"</table>"
+        f'<div style="display:grid;grid-template-columns:1.8fr 1.2fr;border-top:1px solid #0f172a;">'
+        f"<div>{collar_table}</div>"
+        f"<div>{summary_box}</div>"
+        f"</div>"
+        f"</div>"
+    )
+
+
 # Session state navigation
 if "current_view" not in st.session_state:
     st.session_state.current_view = "directory"
@@ -776,9 +963,19 @@ else:
         is_fakir = "fakir knitwear" in industry["name"].lower()
         is_masco = "masco" in industry["name"].lower()
         is_renaissance = "renaissance" in industry["name"].lower()
+        is_adury = "adury" in industry["name"].lower()
         fakir_data = db.get_fakir_knitting_data() if is_fakir else None
 
-        if is_renaissance:
+        if is_adury:
+            mk1, mk2, mk3, mk4 = st.columns(4)
+            mk1.metric("Grand Total Machines", "105")
+            mk2.metric("Circular Knit Machines", "63")
+            mk3.metric("Flat Knit (Collar & Cuff)", "42")
+            mk4.metric("Fabrication Sections", "6")
+
+            st.markdown(render_adury_profile_html(), unsafe_allow_html=True)
+
+        elif is_renaissance:
             mk1, mk2, mk3, mk4 = st.columns(4)
             mk1.metric("Grand Total Machines", "79")
             mk2.metric("Circular Knitting Machines", "67")
