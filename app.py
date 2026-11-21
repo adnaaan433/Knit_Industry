@@ -52,121 +52,72 @@ st.markdown(
         border-bottom: 1px solid rgba(148, 163, 184, 0.2);
         margin-bottom: 0.8rem;
     }
-    /* Modern Theme-Adaptive Machine Profile Tables */
-    .mp-section-card {
-        margin: 0.75rem 0 1.25rem 0;
-        border-radius: 10px;
-        border: 1px solid rgba(148, 163, 184, 0.22);
-        background: rgba(30, 41, 59, 0.25);
-        overflow: hidden;
+    /* L'Esquire / Factory Custom Machine Profile Table */
+    .mp-sheet-container {
+        max-width: 760px;
+        margin: 0.5rem 0 1.25rem 0;
+        border: 1.5px solid #1e293b;
+        background: #ffffff;
+        color: #0f172a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-    .mp-section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        padding: 10px 16px;
-        background: rgba(51, 65, 85, 0.38);
-        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-    }
-    .mp-fab-title {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1.02rem;
-        font-weight: 700;
-    }
-    .mp-fab-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-    .mp-header-pills {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        font-size: 0.83rem;
-    }
-    .mp-stat-pill {
-        padding: 3px 10px;
-        border-radius: 999px;
-        background: rgba(148, 163, 184, 0.14);
-        border: 1px solid rgba(148, 163, 184, 0.22);
-        font-variant-numeric: tabular-nums;
-    }
-    table.mp-modern-table {
+    table.mp-sheet-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 0.88rem;
+        font-family: Calibri, "Segoe UI", Arial, sans-serif;
+        font-size: 0.95rem;
+        color: #0f172a;
+        background: #ffffff;
     }
-    table.mp-modern-table th {
+    table.mp-sheet-table th {
+        background-color: #8ea9db;
+        color: #0f172a;
+        font-weight: 700;
+        text-align: center;
+        padding: 7px 12px;
+        border: 1px solid #334155;
+    }
+    table.mp-sheet-table td {
+        padding: 5px 12px;
+        border: 1px solid #64748b;
+        vertical-align: middle;
+        color: #0f172a;
+        background: #ffffff;
+    }
+    table.mp-sheet-table td.fab-col {
+        text-align: center;
+        font-weight: 500;
+        background: #ffffff;
+    }
+    table.mp-sheet-table td.diagauge-col {
         text-align: left;
-        padding: 9px 14px;
-        font-size: 0.76rem;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        opacity: 0.75;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-        background: rgba(15, 23, 42, 0.18);
+        background: #ffffff;
     }
-    table.mp-modern-table th.r-align,
-    table.mp-modern-table td.r-align {
-        text-align: right;
-        font-variant-numeric: tabular-nums;
+    table.mp-sheet-table td.brand-col {
+        text-align: left;
+        background: #ffffff;
     }
-    table.mp-modern-table th.c-align,
-    table.mp-modern-table td.c-align {
+    table.mp-sheet-table td.total-col {
         text-align: center;
         font-variant-numeric: tabular-nums;
+        background: #ffffff;
     }
-    table.mp-modern-table td {
-        padding: 8px 14px;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-        vertical-align: middle;
-    }
-    table.mp-modern-table tbody tr:hover {
-        background: rgba(59, 130, 246, 0.08);
-    }
-    .diagauge-badge {
-        display: inline-block;
-        padding: 2px 9px;
-        border-radius: 6px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.84rem;
-        font-weight: 600;
-        background: rgba(59, 130, 246, 0.14);
-        color: #60a5fa;
-        border: 1px solid rgba(59, 130, 246, 0.28);
-    }
-    .qty-badge {
-        display: inline-block;
-        min-width: 30px;
-        padding: 2px 8px;
-        border-radius: 6px;
+    table.mp-sheet-table tr.sheet-subtotal-row td {
+        background-color: #8ea9db;
+        color: #0f172a;
         font-weight: 700;
-        background: rgba(148, 163, 184, 0.16);
+        padding: 6px 12px;
+        border-top: 1.5px solid #1e293b;
+        border-bottom: 1.5px solid #1e293b;
     }
-    table.mp-modern-table tr.mp-subtotal-tr td {
-        background: rgba(51, 65, 85, 0.28);
-        font-weight: 700;
-        border-top: 1px solid rgba(148, 163, 184, 0.25);
-        border-bottom: none;
-        padding: 9px 14px;
-    }
-    .mp-grand-banner {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        padding: 14px 20px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(15, 23, 42, 0.4) 100%);
-        border: 1px solid rgba(59, 130, 246, 0.4);
-        margin: 0.5rem 0 1rem 0;
-        font-weight: 700;
+    table.mp-sheet-table tr.sheet-grandtotal-row td {
+        background-color: #ffffff;
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 1.05rem;
+        padding: 8px 12px;
+        border-top: 1.5px solid #1e293b;
+        border-bottom: 2px solid #0f172a;
     }
     </style>
     """,
@@ -198,17 +149,8 @@ def status_badge_html(status: str) -> str:
     return f'<span class="status-badge status-{cls_key}">{status}</span>'
 
 
-FAB_COLORS = {
-    "Single Jersey": "#3b82f6",
-    "Fleece": "#10b981",
-    "H/Jersey": "#f59e0b",
-    "Rib": "#a855f7",
-    "Interlock": "#ec4899",
-}
-
-
 def render_machine_profile_html(industry: dict, machines: list) -> str:
-    """Render the custom Machine Profile table for the factory without Needle/Sinker calculations."""
+    """Render the 4-column grouped Machine Profile table (Fabrication, Dia X Gauge, Brand, Total)."""
     fab_order = ["Fleece", "H/Jersey", "Single Jersey", "Rib", "Interlock"]
     grouped = defaultdict(list)
     for m in machines:
@@ -217,74 +159,67 @@ def render_machine_profile_html(industry: dict, machines: list) -> str:
     ordered_fabs = [f for f in fab_order if f in grouped] + [f for f in grouped if f not in fab_order]
 
     grand_machines = 0
-    sections_html = []
+    rows_html = []
 
     for fab in ordered_fabs:
         fab_items = grouped[fab]
-        dot_color = FAB_COLORS.get(fab, "#64748b")
-        sub_machines = sum(int(i["quantity"] or 0) for i in fab_items)
-        grand_machines += sub_machines
+        fab_rowspan = len(fab_items)
 
-        rows_html = []
-        for item in fab_items:
+        # Merge consecutive identical Dia X Gauge cells within the same Fabrication
+        diagauge_spans = [0] * len(fab_items)
+        i = 0
+        while i < len(fab_items):
+            j = i + 1
+            while j < len(fab_items) and fab_items[j]["dia_gauge_label"] == fab_items[i]["dia_gauge_label"]:
+                j += 1
+            diagauge_spans[i] = j - i
+            i = j
+
+        sub_machines = 0
+        for idx, item in enumerate(fab_items):
             qty = int(item["quantity"] or 0)
-            dia_val = int(item["dia"]) if float(item["dia"]).is_integer() else item["dia"]
-            gauge_val = int(item["gauge"]) if float(item["gauge"]).is_integer() else item["gauge"]
-            brand_str = f"<strong>{html.escape(item['brand'] or '—')}</strong>"
-            if item.get("remarks"):
-                brand_str += f' <span style="opacity:0.68;font-size:0.78rem;">({html.escape(item["remarks"])})</span>'
+            sub_machines += qty
 
-            rows_html.append(
-                f"<tr>"
-                f'<td><span class="diagauge-badge">{html.escape(item["dia_gauge_label"])}</span></td>'
-                f'<td class="c-align">{dia_val}</td>'
-                f'<td class="c-align">{gauge_val}</td>'
-                f"<td>{brand_str}</td>"
-                f'<td class="c-align"><span class="qty-badge">{qty}</span></td>'
-                f"</tr>"
-            )
+            tr_parts = ["<tr>"]
+            if idx == 0:
+                tr_parts.append(f'<td class="fab-col" rowspan="{fab_rowspan}">{html.escape(fab)}</td>')
+            if diagauge_spans[idx] > 0:
+                tr_parts.append(
+                    f'<td class="diagauge-col" rowspan="{diagauge_spans[idx]}">{html.escape(item["dia_gauge_label"])}</td>'
+                )
+            tr_parts.append(f'<td class="brand-col">{html.escape(item["brand"] or "—")}</td>')
+            tr_parts.append(f'<td class="total-col">{qty}</td>')
+            tr_parts.append("</tr>")
+            rows_html.append("".join(tr_parts))
 
+        grand_machines += sub_machines
         rows_html.append(
-            f'<tr class="mp-subtotal-tr">'
-            f'<td colspan="4">{html.escape(fab)} Total</td>'
-            f'<td class="c-align">{sub_machines}</td>'
+            f'<tr class="sheet-subtotal-row">'
+            f'<td colspan="3" style="text-align:left;">{html.escape(fab)} Total</td>'
+            f'<td class="total-col" style="background-color:#8ea9db;">{sub_machines}</td>'
             f"</tr>"
         )
 
-        sections_html.append(
-            f'<div class="mp-section-card">'
-            f'<div class="mp-section-header">'
-            f'<div class="mp-fab-title">'
-            f'<span class="mp-fab-dot" style="background:{dot_color};"></span>'
-            f"<span>{html.escape(fab)}</span>"
-            f"</div>"
-            f'<div class="mp-header-pills">'
-            f'<span class="mp-stat-pill">⚙️ <strong>{sub_machines}</strong> Machines</span>'
-            f"</div>"
-            f"</div>"
-            f'<table class="mp-modern-table">'
-            f"<thead><tr>"
-            f'<th style="width:22%;">Dia × Gauge</th>'
-            f'<th class="c-align" style="width:14%;">Dia</th>'
-            f'<th class="c-align" style="width:14%;">Gauge</th>'
-            f'<th style="width:32%;">Brand</th>'
-            f'<th class="c-align" style="width:18%;">Total</th>'
-            f"</tr></thead>"
-            f'<tbody>{"".join(rows_html)}</tbody>'
-            f"</table>"
-            f"</div>"
-        )
-
-    sections_html.append(
-        f'<div class="mp-grand-banner">'
-        f'<span style="font-size:1.05rem;">🏆 Grand Total</span>'
-        f'<div class="mp-header-pills" style="font-size:0.95rem;">'
-        f'<span class="mp-stat-pill">⚙️ <strong>{grand_machines:,}</strong> Total Machines</span>'
-        f"</div>"
-        f"</div>"
+    rows_html.append(
+        f'<tr class="sheet-grandtotal-row">'
+        f'<td colspan="3" style="text-align:center;">Grand Total</td>'
+        f'<td class="total-col">{grand_machines}</td>'
+        f"</tr>"
     )
 
-    return "".join(sections_html)
+    return (
+        f'<div class="mp-sheet-container">'
+        f'<table class="mp-sheet-table">'
+        f"<thead><tr>"
+        f'<th style="width:24%;">Fabrication</th>'
+        f'<th style="width:28%;">Dia X Gauge</th>'
+        f'<th style="width:32%;">Brand</th>'
+        f'<th style="width:16%;">Total</th>'
+        f"</tr></thead>"
+        f'<tbody>{"".join(rows_html)}</tbody>'
+        f"</table>"
+        f"</div>"
+    )
 
 
 # Session state navigation
