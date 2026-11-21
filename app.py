@@ -208,7 +208,7 @@ FAB_COLORS = {
 
 
 def render_machine_profile_html(industry: dict, machines: list) -> str:
-    """Render modern, theme-adaptive Fabrication section cards and tables with Needle & Sinker calculations."""
+    """Render the custom Machine Profile table for the factory without Needle/Sinker calculations."""
     fab_order = ["Fleece", "H/Jersey", "Single Jersey", "Rib", "Interlock"]
     grouped = defaultdict(list)
     for m in machines:
@@ -217,65 +217,37 @@ def render_machine_profile_html(industry: dict, machines: list) -> str:
     ordered_fabs = [f for f in fab_order if f in grouped] + [f for f in grouped if f not in fab_order]
 
     grand_machines = 0
-    grand_needles = 0
-    grand_sinkers = 0
-
     sections_html = []
 
     for fab in ordered_fabs:
         fab_items = grouped[fab]
         dot_color = FAB_COLORS.get(fab, "#64748b")
-
         sub_machines = sum(int(i["quantity"] or 0) for i in fab_items)
-        sub_needles = sum(int(i["total_needles"] or 0) for i in fab_items)
-        sub_sinkers = sum(int(i["total_sinkers"] or 0) for i in fab_items)
-
         grand_machines += sub_machines
-        grand_needles += sub_needles
-        grand_sinkers += sub_sinkers
 
         rows_html = []
         for item in fab_items:
             qty = int(item["quantity"] or 0)
             dia_val = int(item["dia"]) if float(item["dia"]).is_integer() else item["dia"]
             gauge_val = int(item["gauge"]) if float(item["gauge"]).is_integer() else item["gauge"]
-            n_pm = int(item["needles_per_machine"] or 0)
-            s_pm = int(item["sinkers_per_machine"] or 0)
-            tot_n = int(item["total_needles"] or 0)
-            tot_s = int(item["total_sinkers"] or 0)
-
             brand_str = f"<strong>{html.escape(item['brand'] or '—')}</strong>"
-            if item.get("needle_spec") or item.get("sinker_spec") or item.get("remarks"):
-                meta_bits = [b for b in [item.get("needle_spec"), item.get("sinker_spec"), item.get("remarks")] if b]
-                brand_str += f' <span style="opacity:0.68;font-size:0.78rem;">({html.escape(", ".join(meta_bits))})</span>'
-
-            s_pm_str = f"{s_pm:,}" if s_pm > 0 else '<span style="opacity:0.45;">—</span>'
-            tot_s_str = f"{tot_s:,}" if tot_s > 0 else '<span style="opacity:0.45;">—</span>'
+            if item.get("remarks"):
+                brand_str += f' <span style="opacity:0.68;font-size:0.78rem;">({html.escape(item["remarks"])})</span>'
 
             rows_html.append(
                 f"<tr>"
+                f'<td><span class="diagauge-badge">{html.escape(item["dia_gauge_label"])}</span></td>'
+                f'<td class="c-align">{dia_val}</td>'
+                f'<td class="c-align">{gauge_val}</td>'
                 f"<td>{brand_str}</td>"
                 f'<td class="c-align"><span class="qty-badge">{qty}</span></td>'
-                f'<td class="c-align"><span class="diagauge-badge">{dia_val}</span></td>'
-                f'<td class="c-align"><span class="diagauge-badge">{gauge_val}</span></td>'
-                f'<td class="r-align" style="opacity:0.85;">{n_pm:,}</td>'
-                f'<td class="r-align" style="opacity:0.85;">{s_pm_str}</td>'
-                f'<td class="r-align"><strong>{tot_n:,}</strong></td>'
-                f'<td class="r-align"><strong>{tot_s_str}</strong></td>'
                 f"</tr>"
             )
 
-        sub_s_str = f"{sub_sinkers:,}" if sub_sinkers > 0 else "—"
         rows_html.append(
             f'<tr class="mp-subtotal-tr">'
-            f"<td>{html.escape(fab)} Subtotal</td>"
+            f'<td colspan="4">{html.escape(fab)} Total</td>'
             f'<td class="c-align">{sub_machines}</td>'
-            f'<td class="c-align" style="opacity:0.5;">—</td>'
-            f'<td class="c-align" style="opacity:0.5;">—</td>'
-            f'<td class="r-align" style="opacity:0.5;">—</td>'
-            f'<td class="r-align" style="opacity:0.5;">—</td>'
-            f'<td class="r-align" style="color:#60a5fa;">{sub_needles:,}</td>'
-            f'<td class="r-align" style="color:#34d399;">{sub_s_str}</td>'
             f"</tr>"
         )
 
@@ -288,20 +260,15 @@ def render_machine_profile_html(industry: dict, machines: list) -> str:
             f"</div>"
             f'<div class="mp-header-pills">'
             f'<span class="mp-stat-pill">⚙️ <strong>{sub_machines}</strong> Machines</span>'
-            f'<span class="mp-stat-pill">🪡 <strong>{sub_needles:,}</strong> Needles</span>'
-            f'<span class="mp-stat-pill">🔩 <strong>{sub_s_str}</strong> Sinkers</span>'
             f"</div>"
             f"</div>"
             f'<table class="mp-modern-table">'
             f"<thead><tr>"
-            f'<th style="width:22%;">Brand</th>'
-            f'<th class="c-align" style="width:12%;">Total Machine</th>'
-            f'<th class="c-align" style="width:9%;">Dia</th>'
-            f'<th class="c-align" style="width:9%;">Gauge</th>'
-            f'<th class="r-align" style="width:12%;">Needles/M</th>'
-            f'<th class="r-align" style="width:12%;">Sinkers/M</th>'
-            f'<th class="r-align" style="width:12%;">Total Needles</th>'
-            f'<th class="r-align" style="width:12%;">Total Sinkers</th>'
+            f'<th style="width:22%;">Dia × Gauge</th>'
+            f'<th class="c-align" style="width:14%;">Dia</th>'
+            f'<th class="c-align" style="width:14%;">Gauge</th>'
+            f'<th style="width:32%;">Brand</th>'
+            f'<th class="c-align" style="width:18%;">Total</th>'
             f"</tr></thead>"
             f'<tbody>{"".join(rows_html)}</tbody>'
             f"</table>"
@@ -310,11 +277,9 @@ def render_machine_profile_html(industry: dict, machines: list) -> str:
 
     sections_html.append(
         f'<div class="mp-grand-banner">'
-        f'<span style="font-size:1.05rem;">🏆 Grand Total Across All Fabrications</span>'
-        f'<div class="mp-header-pills" style="font-size:0.92rem;">'
+        f'<span style="font-size:1.05rem;">🏆 Grand Total</span>'
+        f'<div class="mp-header-pills" style="font-size:0.95rem;">'
         f'<span class="mp-stat-pill">⚙️ <strong>{grand_machines:,}</strong> Total Machines</span>'
-        f'<span class="mp-stat-pill">🪡 <strong>{grand_needles:,}</strong> Total Needles</span>'
-        f'<span class="mp-stat-pill">🔩 <strong>{grand_sinkers:,}</strong> Total Sinkers</span>'
         f"</div>"
         f"</div>"
     )
@@ -676,259 +641,48 @@ else:
     )
 
     # --------------------------------------------------------------------------
-    # TAB 1: MACHINE PROFILE & NEEDLE/SINKER CALCULATOR
+    # TAB 1: MACHINE PROFILE
     # --------------------------------------------------------------------------
     with tab_machines:
-        st.subheader(f"⚙️ Machine Profile & Needle/Sinker Requirements — {industry['name']}")
-
-        with st.expander("ℹ️ Needle & Sinker Calculation Formula Reference", expanded=False):
-            st.markdown(
-                """
-                - **Single Jersey, Fleece, H/Jersey**:
-                  - **Needles per Machine** = `int(Dia × Gauge × 3.1416)`
-                  - **Sinkers per Machine** = `int(Dia × Gauge × 3.1416)`
-                - **Rib, Interlock**:
-                  - **Needles per Machine** = `int(2 × Dia × Gauge × 3.1416)` *(Cylinder + Dial)*
-                  - **Sinkers per Machine** = `0` *(Double-jersey machines)*
-                - **Total Needles / Sinkers for Row** = `Per-Machine Requirement × Total Machines`
-                """
-            )
-
-        # Add Machine Row Form with Live Formula Preview
-        with st.container(border=True):
-            st.markdown("#### ➕ Add Machine to Profile")
-            available_brands = db.get_all_brands()
-            brand_dropdown_opts = available_brands + ["➕ Add New Brand..."]
-
-            fc1, fc2, fc3, fc4, fc5 = st.columns([1.5, 1.6, 1.1, 1, 1])
-            with fc1:
-                in_fab = st.selectbox("Fabrication *", options=db.FABRICATION_TYPES, key=f"mp_fab_{industry_id}")
-            with fc2:
-                in_brand_choice = st.selectbox(
-                    "Brand (Select or type new) *",
-                    options=brand_dropdown_opts,
-                    accept_new_options=True,
-                    help="Select an existing brand, type a new brand name directly here and press Enter, or choose '➕ Add New Brand...' to type below.",
-                    key=f"mp_brand_sel_{industry_id}",
-                )
-            with fc3:
-                in_qty = st.number_input("Total Machine *", min_value=1, max_value=500, value=1, step=1, key=f"mp_qty_{industry_id}")
-            with fc4:
-                in_dia = st.number_input("Dia *", min_value=1, max_value=100, value=30, step=1, key=f"mp_dia_{industry_id}")
-            with fc5:
-                in_gauge = st.number_input("Gauge *", min_value=1, max_value=60, value=24, step=1, key=f"mp_gg_{industry_id}")
-
-            opt_c1, opt_c2, opt_c3, opt_c4 = st.columns([1.5, 1.5, 1.5, 1.5])
-            with opt_c1:
-                custom_brand_input = st.text_input(
-                    "Or Enter New Brand Name",
-                    placeholder="Type new brand name here...",
-                    key=f"mp_custom_brand_{industry_id}",
-                )
-                if custom_brand_input.strip():
-                    final_brand = custom_brand_input.strip()
-                elif in_brand_choice and in_brand_choice != "➕ Add New Brand...":
-                    final_brand = in_brand_choice.strip()
-                else:
-                    final_brand = ""
-            with opt_c2:
-                in_needle_spec = st.text_input("Needle Spec / Part No. (Optional)", placeholder="e.g. Voelker / GB", key=f"mp_nspec_{industry_id}")
-            with opt_c3:
-                in_sinker_spec = st.text_input("Sinker Spec / Part No. (Optional)", placeholder="e.g. Kern-Liebers", key=f"mp_sspec_{industry_id}")
-            with opt_c4:
-                in_remarks = st.text_input("Remarks (Optional)", key=f"mp_rem_{industry_id}")
-
-            # Live Preview of Formula Output
-            live_calc = db.calculate_needle_sinker(in_fab, in_dia, in_gauge, in_qty)
-            live_label = db.format_dia_gauge(in_dia, in_gauge)
-
-            prev_col, btn_col = st.columns([4, 1.4])
-            with prev_col:
-                sinker_preview = (
-                    f"**{live_calc['sinkers_per_machine']:,}** / machine (**{live_calc['total_sinkers']:,}** total)"
-                    if live_calc["sinkers_per_machine"] > 0
-                    else "**N/A (0)** for Rib/Interlock"
-                )
-                st.info(
-                    f"🧮 **Auto-Calculation ({in_fab} • {final_brand or 'Brand'} • {in_qty} M • Dia {in_dia} • Gauge {in_gauge}):**  "
-                    f"Needles = **{live_calc['needles_per_machine']:,}** / M (**{live_calc['total_needles']:,}** total)  |  "
-                    f"Sinkers = {sinker_preview}"
-                )
-            with btn_col:
-                if st.button("➕ Add Machine Row", type="primary", use_container_width=True, key=f"btn_add_mp_{industry_id}"):
-                    if not final_brand or not final_brand.strip():
-                        st.error("Please provide a Brand name.")
-                    else:
-                        db.add_machine(
-                            industry_id=industry_id,
-                            fabrication=in_fab,
-                            dia=in_dia,
-                            gauge=in_gauge,
-                            dia_gauge_label=live_label,
-                            brand=final_brand,
-                            quantity=in_qty,
-                            needle_spec=in_needle_spec,
-                            sinker_spec=in_sinker_spec,
-                            remarks=in_remarks,
-                        )
-                        st.toast(f"Added {in_qty}x {final_brand} (Dia {in_dia}, Gauge {in_gauge}) to {industry['name']}!")
-                        st.rerun()
+        st.subheader(f"⚙️ Machine Profile — {industry['name']}")
 
         if not machines:
-            st.info("No machines added to this factory's profile yet. Use the form above to add machines.")
+            st.info(
+                "No machine profile table has been added for this industry yet. "
+                "Share the factory's machine profile photo or PDF in the chat to have its exact table format added here."
+            )
         else:
-            # Summary KPIs for this Factory's Machine Profile
             grand_m = sum(m["quantity"] for m in machines)
-            grand_n = sum(m["total_needles"] for m in machines)
-            grand_s = sum(m["total_sinkers"] for m in machines)
             unique_brands = len({m["brand"] for m in machines if m["brand"]})
+            unique_fabs = len({m["fabrication"] for m in machines if m["fabrication"]})
 
-            mk1, mk2, mk3, mk4 = st.columns(4)
+            mk1, mk2, mk3 = st.columns(3)
             mk1.metric("Grand Total Machines", f"{grand_m:,}")
-            mk2.metric("Total Needles Required", f"{grand_n:,}")
-            mk3.metric("Total Sinkers Required", f"{grand_s:,}")
-            mk4.metric("Machine Brands", unique_brands)
+            mk2.metric("Fabrication Categories", unique_fabs)
+            mk3.metric("Machine Brands", unique_brands)
 
-            # Sub-tabs inside Machine Profile: Formatted Report View, Brand/Dia Breakdown, Edit/Delete Rows
-            mp_view_tab1, mp_view_tab2, mp_view_tab3 = st.tabs(
+            st.markdown(render_machine_profile_html(industry, machines), unsafe_allow_html=True)
+
+            export_df = pd.DataFrame(
                 [
-                    "📊 Formatted Machine Profile Sheet",
-                    "📈 Breakdown by Fabrication & Brand",
-                    "✏️ Edit / Delete Machine Rows",
+                    {
+                        "Fabrication": m["fabrication"],
+                        "Dia X Gauge": m["dia_gauge_label"],
+                        "Dia": int(m["dia"]) if float(m["dia"]).is_integer() else m["dia"],
+                        "Gauge": int(m["gauge"]) if float(m["gauge"]).is_integer() else m["gauge"],
+                        "Brand": m["brand"],
+                        "Total": m["quantity"],
+                    }
+                    for m in machines
                 ]
             )
-
-            with mp_view_tab1:
-                st.markdown(render_machine_profile_html(industry, machines), unsafe_allow_html=True)
-
-                # CSV Export
-                export_df = pd.DataFrame(
-                    [
-                        {
-                            "Fabrication": m["fabrication"],
-                            "Brand": m["brand"],
-                            "Total Machine": m["quantity"],
-                            "Dia": int(m["dia"]) if float(m["dia"]).is_integer() else m["dia"],
-                            "Gauge": int(m["gauge"]) if float(m["gauge"]).is_integer() else m["gauge"],
-                            "Needles/M": m["needles_per_machine"],
-                            "Sinkers/M": m["sinkers_per_machine"],
-                            "Total Needles": m["total_needles"],
-                            "Total Sinkers": m["total_sinkers"],
-                            "Needle Spec": m["needle_spec"],
-                            "Sinker Spec": m["sinker_spec"],
-                            "Remarks": m["remarks"],
-                        }
-                        for m in machines
-                    ]
-                )
-                csv_bytes = export_df.to_csv(index=False).encode("utf-8")
-                st.download_button(
-                    label="📥 Download Machine Profile & Needle/Sinker Sheet (CSV)",
-                    data=csv_bytes,
-                    file_name=f"{industry['name'].replace(' ', '_')}_Machine_Profile.csv",
-                    mime="text/csv",
-                )
-
-            with mp_view_tab2:
-                b_col1, b_col2 = st.columns(2)
-                with b_col1:
-                    st.markdown("#### Summary by Fabrication")
-                    fab_summary = defaultdict(lambda: {"Machines": 0, "Total Needles": 0, "Total Sinkers": 0})
-                    for m in machines:
-                        f = m["fabrication"]
-                        fab_summary[f]["Machines"] += m["quantity"]
-                        fab_summary[f]["Total Needles"] += m["total_needles"]
-                        fab_summary[f]["Total Sinkers"] += m["total_sinkers"]
-                    df_fab = pd.DataFrame(
-                        [
-                            {
-                                "Fabrication": k,
-                                "Total Machines": v["Machines"],
-                                "Total Needles": v["Total Needles"],
-                                "Total Sinkers": v["Total Sinkers"],
-                            }
-                            for k, v in fab_summary.items()
-                        ]
-                    )
-                    st.dataframe(df_fab, use_container_width=True, hide_index=True)
-
-                with b_col2:
-                    st.markdown("#### Summary by Machine Brand")
-                    brand_summary = defaultdict(lambda: {"Machines": 0, "Total Needles": 0, "Total Sinkers": 0})
-                    for m in machines:
-                        b = m["brand"] or "Unspecified"
-                        brand_summary[b]["Machines"] += m["quantity"]
-                        brand_summary[b]["Total Needles"] += m["total_needles"]
-                        brand_summary[b]["Total Sinkers"] += m["total_sinkers"]
-                    df_brand = pd.DataFrame(
-                        [
-                            {
-                                "Brand": k,
-                                "Total Machines": v["Machines"],
-                                "Total Needles": v["Total Needles"],
-                                "Total Sinkers": v["Total Sinkers"],
-                            }
-                            for k, v in sorted(brand_summary.items(), key=lambda x: -x[1]["Machines"])
-                        ]
-                    )
-                    st.dataframe(df_brand, use_container_width=True, hide_index=True)
-
-            with mp_view_tab3:
-                st.caption("Edit or remove individual machine rows below. Any change to Fabrication, Brand, Total Machine, Dia, or Gauge automatically updates the Needle and Sinker counts.")
-                for m in machines:
-                    d_disp = int(m["dia"]) if float(m["dia"]).is_integer() else m["dia"]
-                    g_disp = int(m["gauge"]) if float(m["gauge"]).is_integer() else m["gauge"]
-                    with st.expander(
-                        f"{m['fabrication']} | {m['brand']} | Total Machine: {m['quantity']} | Dia: {d_disp} | Gauge: {g_disp} "
-                        f"(Needles/M: {m['needles_per_machine']:,}, Sinkers/M: {m['sinkers_per_machine']:,})"
-                    ):
-                        with st.form(f"edit_mach_row_{m['id']}"):
-                            em1, em2, em3, em4, em5 = st.columns([1.4, 1.5, 1.1, 1, 1])
-                            with em1:
-                                e_fab_opts = (
-                                    db.FABRICATION_TYPES
-                                    if m["fabrication"] in db.FABRICATION_TYPES
-                                    else [m["fabrication"]] + db.FABRICATION_TYPES
-                                )
-                                e_fab = st.selectbox("Fabrication", options=e_fab_opts, index=e_fab_opts.index(m["fabrication"]))
-                            with em2:
-                                e_brand = st.text_input("Brand", value=m["brand"])
-                            with em3:
-                                e_qty = st.number_input("Total Machine", min_value=1, max_value=500, value=int(m["quantity"]), step=1)
-                            with em4:
-                                e_dia = st.number_input("Dia", min_value=1.0, max_value=100.0, value=float(m["dia"]), step=1.0)
-                            with em5:
-                                e_gg = st.number_input("Gauge", min_value=1.0, max_value=60.0, value=float(m["gauge"]), step=1.0)
-
-                            em7, em8, em9 = st.columns([1.3, 1.3, 1.4])
-                            with em7:
-                                e_nspec = st.text_input("Needle Spec", value=m["needle_spec"] or "")
-                            with em8:
-                                e_sspec = st.text_input("Sinker Spec", value=m["sinker_spec"] or "")
-                            with em9:
-                                e_rem = st.text_input("Remarks", value=m["remarks"] or "")
-
-                            b_col_save, b_col_del = st.columns([3, 1])
-                            with b_col_save:
-                                if st.form_submit_button("💾 Update Row", use_container_width=True, type="primary"):
-                                    final_lbl = db.format_dia_gauge(e_dia, e_gg)
-                                    db.update_machine(
-                                        machine_id=m["id"],
-                                        fabrication=e_fab,
-                                        dia=e_dia,
-                                        gauge=e_gg,
-                                        dia_gauge_label=final_lbl,
-                                        brand=e_brand,
-                                        quantity=e_qty,
-                                        needle_spec=e_nspec,
-                                        sinker_spec=e_sspec,
-                                        remarks=e_rem,
-                                    )
-                                    st.rerun()
-                            with b_col_del:
-                                if st.form_submit_button("🗑️ Delete Row", use_container_width=True):
-                                    db.delete_machine(m["id"])
-                                    st.rerun()
+            csv_bytes = export_df.to_csv(index=False).encode("utf-8")
+            st.download_button(
+                label="📥 Download Machine Profile (CSV)",
+                data=csv_bytes,
+                file_name=f"{industry['name'].replace(' ', '_')}_Machine_Profile.csv",
+                mime="text/csv",
+            )
 
         st.divider()
         with st.expander("📋 General Machine Floor Notes", expanded=bool(industry["machine_profile_notes"])):
