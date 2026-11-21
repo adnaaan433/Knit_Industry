@@ -3,10 +3,14 @@
 from datetime import date
 import os
 import streamlit as st
-from components.forms import open_add_factory_dialog
-import db
+from auth.gate import require_login, sign_out
 
 st.set_page_config(page_title="Knit Industry CRM", page_icon="🏭", layout="wide")
+require_login()
+
+from components.forms import open_add_factory_dialog  # noqa: E402
+import db  # noqa: E402
+
 db.init_db()
 
 css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "theme", "styles.css")
@@ -48,5 +52,8 @@ with st.sidebar:
             st.cache_data.clear()
             st.success("Database restored.")
             st.rerun()
+    st.divider()
+    if st.button("Sign out", use_container_width=True):
+        sign_out()
 
 pg.run()

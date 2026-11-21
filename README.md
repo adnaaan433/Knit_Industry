@@ -6,7 +6,13 @@ A Streamlit + SQLite CRM for managing knitting factories in Bangladesh: factory 
 
 ```
 knit_crm/
-├── app.py                      # Entry point: page config, CSS loader, st.navigation()
+├── app.py                      # Entry point: page config, require_login(), CSS loader, st.navigation()
+├── auth/
+│   ├── __init__.py
+│   ├── gate.py                 # require_login() & sign_out()
+│   ├── login_page.py           # On-theme login UI, greeting, lockout & rotating textile fact
+│   ├── security.py             # PBKDF2-HMAC-SHA256 hash_password() & verify_password()
+│   └── facts.py                # Generic circular knitting & textile facts
 ├── pages/
 │   ├── dashboard.py            # KPIs, follow-ups due, pipeline, cluster summary, recent visits
 │   ├── factories.py            # Master-detail factory browser (?factory=<id>) with 4 tabs
@@ -35,17 +41,40 @@ knit_crm/
 ├── config/
 │   └── constants.py            # STATUS_OPTIONS, STATUS_RANK, VISIT_TYPES, FABRICATION_TYPES, DEFAULT_BRANDS
 ├── theme/
-│   └── styles.css              # Light/dark theme-aware CSS variables
+│   ├── styles.css              # Light/dark theme-aware CSS variables
+│   └── login.css               # Login page animations, knit-stitch pattern & responsive card
 ├── .streamlit/
-│   └── config.toml             # Streamlit theme and server settings
+│   ├── config.toml             # Streamlit theme and server settings
+│   └── secrets.toml.example    # Example secret configuration for app_password_hash
 ├── data/
 │   ├── crm_data.db
 │   └── Knit Industry Contacts.xlsx
 ├── scripts/
+│   ├── make_password_hash.py   # CLI tool to generate salted PBKDF2 password hashes
 │   └── verify_totals.py        # Automated verification of DB counts, machine totals & needle/sinker math
 ├── requirements.txt
 └── README.md
 ```
+
+## Login Setup
+
+The app requires a salted PBKDF2-HMAC-SHA256 password hash stored in `app_password_hash` and fails closed if the secret is missing.
+
+### 1. Generate a Password Hash Locally
+
+Run the hash generator script and enter your desired password when prompted:
+
+```bash
+python scripts/make_password_hash.py
+```
+
+Copy the printed `app_password_hash = "pbkdf2$200000$..."` line into `.streamlit/secrets.toml` (which is gitignored).
+
+### 2. Configure Secrets on Streamlit Community Cloud
+
+1. Open your deployed app dashboard on [share.streamlit.io](https://share.streamlit.io/).
+2. Click **⋮ (More options) → Settings → Secrets**.
+3. Paste the `app_password_hash = "pbkdf2$200000$..."` line into the Secrets box and click **Save**.
 
 ## Design & Data Decisions
 
@@ -71,5 +100,6 @@ python scripts/verify_totals.py
 ## Deployment on Streamlit Community Cloud
 
 1. Push this repository to GitHub with `app.py` as the main file path.
-2. Keep `data/crm_data.db` and `data/Knit Industry Contacts.xlsx` committed in the repository.
-3. **Ephemeral Cloud Storage Note**: Streamlit Community Cloud container storage is ephemeral across restarts. Use the **Data → Download backup (.db)** and **Restore backup (.db)** controls in the sidebar to persist and restore database edits made on the cloud.
+2. Add `app_password_hash` in the app's **Settings → Secrets** on Streamlit Community Cloud.
+3. Keep `data/crm_data.db` and `data/Knit Industry Contacts.xlsx` committed in the repository.
+4. **Ephemeral Cloud Storage Note**: Streamlit Community Cloud container storage is ephemeral across restarts. Use the **Data → Download backup (.db)** and **Restore backup (.db)** controls in the sidebar to persist and restore database edits made on the cloud.

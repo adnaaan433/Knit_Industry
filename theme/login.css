@@ -1,0 +1,195 @@
+/* Login page styles — loaded only while unauthenticated */
+
+[data-testid="stSidebar"],
+[data-testid="stSidebarNav"],
+[data-testid="stSidebarCollapsedControl"],
+header[data-testid="stHeader"],
+header,
+footer {
+    display: none !important;
+}
+
+.block-container {
+    padding-top: 6vh !important;
+    padding-bottom: 2rem !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+}
+
+/* Subtle drifting V-stitch knit background on stApp */
+[data-testid="stAppViewContainer"] {
+    position: relative;
+    overflow: hidden;
+    background-image:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.055) 25%, transparent 25%),
+        linear-gradient(225deg, rgba(37, 99, 235, 0.055) 25%, transparent 25%),
+        linear-gradient(45deg, rgba(148, 163, 184, 0.04) 25%, transparent 25%),
+        linear-gradient(315deg, rgba(148, 163, 184, 0.04) 25%, transparent 25%);
+    background-position: 14px 0, 14px 0, 0 0, 0 0;
+    background-size: 28px 28px;
+    background-repeat: repeat;
+    animation: stitchDrift 28s linear infinite;
+}
+
+@keyframes stitchDrift {
+    0% { background-position: 14px 0, 14px 0, 0 0, 0 0; }
+    100% { background-position: 14px 112px, 14px 112px, 0 112px, 0 112px; }
+}
+
+/* Soft floating blurred yarn circles */
+.yarn-orb-wrap {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+.yarn-orb {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.16);
+    filter: blur(56px);
+    animation: orbFloat 12s ease-in-out infinite alternate;
+}
+.yarn-orb-1 {
+    width: 240px;
+    height: 240px;
+    top: 12%;
+    left: calc(50% - 260px);
+}
+.yarn-orb-2 {
+    width: 210px;
+    height: 210px;
+    bottom: 14%;
+    right: calc(50% - 250px);
+    animation-delay: -5s;
+}
+
+@keyframes orbFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(16px, -20px) scale(1.07); }
+}
+
+/* Login Card */
+div[data-testid="stForm"] {
+    position: relative;
+    z-index: 1;
+    border-radius: 14px !important;
+    padding: 1.65rem 1.6rem 1.4rem 1.6rem !important;
+    border: 1px solid rgba(148, 163, 184, 0.28) !important;
+    background: var(--secondary-background-color, rgba(148, 163, 184, 0.08)) !important;
+    box-shadow: 0 14px 36px -12px rgba(0, 0, 0, 0.22);
+    animation: cardEnter 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cardEnter {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Shake on wrong password */
+.login-shake div[data-testid="stForm"] {
+    animation: cardShake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+    border-color: rgba(220, 38, 38, 0.55) !important;
+}
+
+@keyframes cardShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-9px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(5px); }
+}
+
+/* Exit on success */
+.login-success-card {
+    padding: 2rem 1.6rem;
+    border-radius: 14px;
+    border: 1px solid rgba(37, 99, 235, 0.4);
+    background: var(--secondary-background-color, rgba(148, 163, 184, 0.08));
+    text-align: center;
+    animation: cardSuccess 0.55s ease-in-out forwards;
+}
+
+@keyframes cardSuccess {
+    0% { opacity: 1; transform: scale(1); }
+    65% { opacity: 1; transform: scale(0.985); }
+    100% { opacity: 0.18; transform: scale(0.95); }
+}
+
+/* Brand Header Block */
+.login-brand-block {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    margin-bottom: 1.25rem;
+    animation: cardEnter 0.32s ease-out both;
+}
+.needle-mark-svg {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 0.5rem auto;
+    display: block;
+}
+.yarn-loop-path {
+    transform-origin: 27px 27px;
+    animation: yarnSway 3.8s ease-in-out infinite alternate;
+}
+@keyframes yarnSway {
+    0% { transform: rotate(-5deg) translateY(0); }
+    100% { transform: rotate(5deg) translateY(1.5px); }
+}
+.login-app-title {
+    font-size: 1.45rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+.login-tagline {
+    font-size: 0.86rem;
+    opacity: 0.72;
+    margin: 0.25rem 0 0 0;
+}
+.login-greeting {
+    font-size: 0.96rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+/* Accessible Focus & Alert */
+div[data-testid="stForm"] input:focus-visible {
+    outline: 2px solid #2563eb !important;
+    outline-offset: 2px !important;
+}
+.login-alert {
+    margin-top: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    background: rgba(220, 38, 38, 0.14);
+    color: #ef4444;
+    border: 1px solid rgba(220, 38, 38, 0.35);
+}
+.login-fact-footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    font-size: 0.78rem;
+    opacity: 0.68;
+    margin-top: 1.15rem;
+    line-height: 1.45;
+    padding: 0 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-testid="stAppViewContainer"],
+    .yarn-orb,
+    div[data-testid="stForm"],
+    .login-shake div[data-testid="stForm"],
+    .login-success-card,
+    .login-brand-block,
+    .yarn-loop-path {
+        animation: none !important;
+    }
+}
