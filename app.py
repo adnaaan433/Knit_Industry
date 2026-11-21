@@ -742,6 +742,130 @@ def render_tosrifa_profile_html() -> str:
     )
 
 
+SM_KNITWEARS_ROWS = [
+    # (dia, feeder, mc_type, brand, qty, g28, g24, g20, g18, g14, origin, lycra)
+    ('25"', 75, "S/J", "Jiunn Long", 1, "", 1, "", "", "", "Taiwan", ""),
+    ('26"', 84, "S/J", "Lisky", 1, "", 1, "", "", "", "Taiwan", ""),
+    ('26"', 78, "S/J & Fleece", "Jiunn Long", 2, "", 2, 2, "", "", "Taiwan", ""),
+    ('27"', 81, "S/J", "Jiunn Long", 1, "", 1, "", "", "", "Taiwan", ""),
+    ('27"', 86, "S/J", "Lisky", 1, "", 1, "", "", "", "Taiwan", ""),
+    ('28"', 90, "S/J", "Lisky", 2, "", 2, "", "", "", "Taiwan", ""),
+    ('38"', 114, "S/J", "Lisky", 1, "", 1, "", "", "", "Taiwan", ""),
+    ('28"', 90, "S/J Open with", "Fukuhara", 1, 1, 1, "", "", "", "Japan", "Yes"),
+    ('30"', 96, "S/J Open with", "Fukuhara", 3, 2, 3, "", "", "", "Japan", "Yes"),
+    ('30"', 90, "S/J & Fleece", "Jiunn Long", 3, "", 3, 3, "", "", "Taiwan", ""),
+    ('30"', 96, "S/J & Fleece", "Lisky", 2, "", 2, 2, "", 1, "Taiwan", ""),
+    ('32"', 104, "S/J Open with", "Fukuhara", 2, 2, 2, "", "", "", "Japan", "Yes"),
+    ('32"', 96, "S/J & Fleece", "Jiunn Long", 3, "", 3, 3, "", "", "Taiwan", ""),
+    ('32"', 102, "S/J & Fleece", "Lisky", 2, "", 2, 2, "", 1, "Taiwan", ""),
+    ('34"', 108, "S/J Open with", "Fukuhara", 1, "", 1, "", "", "", "Japan", "Yes"),
+    ('34"', 108, "S/J Open with", "Lisky", 3, "", 3, "", "", "", "Taiwan", "Yes"),
+    ('34"', 102, "S/J & Fleece", "Jiunn Long", 3, "", 3, 3, "", "", "Taiwan", ""),
+    ('34"', 108, "S/J & Fleece", "Lisky", 2, "", 2, 2, "", 1, "Taiwan", ""),
+    ('36"', 116, "S/J Open with", "Fukuhara", 3, "", 3, "", "", "", "Japan", "Yes"),
+    ('36"', 114, "S/J Open with", "Lisky", 2, "", 2, "", "", "", "Taiwan", "Yes"),
+    ('36"', 108, "S/J & Fleece", "Jiunn Long", 2, "", 2, 2, "", "", "Taiwan", ""),
+    ('36"', 114, "S/J & Fleece", "Lisky", 2, "", 2, 2, "", 1, "Taiwan", ""),
+    ('38"', 120, "S/J Open with", "Fukuhara", 3, "", 3, "", "", "", "Japan", "Yes"),
+    ('40"', 128, "S/J Open with", "Fukuhara", 1, "", 1, "", "", "", "Japan", "Yes"),
+    ('32"', 44, "Auto Striper", "Pai Lung", 1, "", 1, "", "", "", "Taiwan", "Yes"),
+    ('34"', 48, "Auto Striper", "Pai Lung", 2, "", 2, "", "", "", "Taiwan", "Yes"),
+    ('36"', 50, "Auto Striper", "Pai Lung", 1, "", 1, "", "", "", "Taiwan", "Yes"),
+    ('34"', 108, "Fleece", "Lisky", 1, "", "", 1, "", "", "Taiwan", ""),
+    ('36"', 114, "Fleece", "Lisky", 2, "", "", 2, "", "", "Taiwan", ""),
+    ('38"', 114, "S/J & Fleece", "Jiunn Long", 2, "", 2, 2, "", "", "Taiwan", ""),
+    ('38"', 120, "S/J & Fleece", "Lisky", 2, "", 2, 2, "", "", "Taiwan", ""),
+    ('38"', 120, "S/J & Fleece", "Goanglih", 2, "", "", 2, "", "", "Taiwan", ""),
+    ('30"', 96, "S/J & Fleece", "Goanglih", 2, "", "", 2, "", "", "Taiwan", ""),
+    ('32"', 102, "S/J & Fleece", "Goanglih", 3, "", "", 3, "", 1, "Taiwan", ""),
+    ('34"', 108, "S/J & Fleece", "Goanglih", 4, "", "", 4, "", 2, "Taiwan", ""),
+    ('36"', 114, "S/J & Fleece", "Goanglih", 4, "", "", 2, "", 2, "Taiwan", ""),
+    ('32"', 64, "Rib", "Jiunn Long", 1, "", "", "", 1, "", "Taiwan", "Yes"),
+    ('38"', 77, "Rib", "Jiunn Long", 1, "", "", "", 1, "", "Taiwan", "Yes"),
+    ('40"', 80, "Rib", "Jiunn Long", 1, "", "", "", 1, "", "Taiwan", "Yes"),
+    ('42"', 84, "Rib", "Jiunn Long", 1, "", "", "", 1, "", "Taiwan", "Yes"),
+    ('44"', 88, "Rib", "Jiunn Long", 1, "", "", "", 1, "", "Taiwan", "Yes"),
+    ('40"', 80, "Rib", "Fukuhara", 1, "", "", "", 1, "", "Japan", "Yes"),
+    ('44"', 88, "Rib", "Fukuhara", 2, "", "", "", 2, "", "Japan", "Yes"),
+    ('44"', 88, "Rib", "Pai Lung", 2, "", "", "", 2, "", "Taiwan", "Yes"),
+    ('42"', 84, "Rib", "Pai Lung", 2, "", "", "", 2, "", "Taiwan", "Yes"),
+    ('40"', 80, "Rib", "Pai Lung", 2, "", "", "", 2, "", "Taiwan", "Yes"),
+    ('36"', 68, "Rib/Interlock", "Fukuhara", 1, "", 1, "", 1, "", "Taiwan", "Yes"),
+    ('34"', 72, "Rib/Interlock", "Lisky", 1, "", 1, "", 1, "", "Taiwan", "Yes"),
+    ('34"', 62, "Rib/Interlock", "Fukuhara", 1, "", 1, "", 1, "", "Taiwan", "Yes"),
+    ('32"', 68, "Rib/Interlock", "Lisky", 1, "", 1, "", 1, "", "Taiwan", "Yes"),
+    ('38"', 68, "Rib/Interlock", "Fukuhara", 1, "", 1, "", 1, "", "Japan", "Yes"),
+    ('38"', 76, "Rib/Interlock", "Pai Lung", 1, "", 1, "", 1, "", "Taiwan", "Yes"),
+    ('36"', 72, "Rib/Interlock", "Pai Lung", 2, "", 2, "", 2, "", "Taiwan", "Yes"),
+    ('34"', 68, "Rib/Interlock", "Pai Lung", 3, "", 2, "", 3, "", "Taiwan", "Yes"),
+    ('32"', 64, "Rib/Interlock", "Pai Lung", 1, "", 1, "", 1, "", "Taiwan", "Yes"),
+]
+
+
+def render_sm_profile_html() -> str:
+    """Render S.M. Knitwears (S.M. Group) Knitting Machine Profile table."""
+    trs = [
+        "<tr>"
+        '<th rowspan="2" style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:8%;">Dia</th>'
+        '<th rowspan="2" style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:8%;">Feeder</th>'
+        '<th rowspan="2" style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:16%;">Type of Machine</th>'
+        '<th rowspan="2" style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:13%;">Brand</th>'
+        '<th rowspan="2" style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:9%;">No of Machine Set</th>'
+        '<th colspan="5" style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:25%;">Gauge &amp; Extra cylinder</th>'
+        '<th rowspan="2" style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:10%;">Orizin</th>'
+        '<th rowspan="2" style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;width:11%;">Lycra Attachment</th>'
+        "</tr>",
+        "<tr>"
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;">28</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;">24</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;">20</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;">18</th>'
+        '<th style="background-color:#ffffff;color:#0f172a;border:1.5px solid #0f172a;">14</th>'
+        "</tr>",
+    ]
+    for dia, feeder, mtype, brand, qty, g28, g24, g20, g18, g14, origin, lycra in SM_KNITWEARS_ROWS:
+        is_shaded = mtype == "Auto Striper"
+        bg = ' style="background-color:#e2e8f0;"' if is_shaded else ""
+        trs.append(
+            f"<tr{bg}>"
+            f'<td class="total-col"{bg}><strong>{html.escape(dia)}</strong></td>'
+            f'<td class="total-col"{bg}>{feeder}</td>'
+            f'<td class="total-col"{bg}>{html.escape(mtype)}</td>'
+            f'<td class="total-col"{bg}>{html.escape(brand)}</td>'
+            f'<td class="total-col"{bg}><strong>{qty}</strong></td>'
+            f'<td class="total-col"{bg}>{g28}</td>'
+            f'<td class="total-col"{bg}>{g24}</td>'
+            f'<td class="total-col"{bg}>{g20}</td>'
+            f'<td class="total-col"{bg}>{g18}</td>'
+            f'<td class="total-col"{bg}>{g14}</td>'
+            f'<td class="total-col"{bg}>{html.escape(origin)}</td>'
+            f'<td class="total-col"{bg}>{html.escape(lycra)}</td>'
+            f"</tr>"
+        )
+
+    trs.append(
+        "<tr>"
+        '<td colspan="2" style="border:1.5px solid #0f172a;"></td>'
+        '<td colspan="2" style="text-align:center;font-weight:800;border:1.5px solid #0f172a;padding:6px;">Total</td>'
+        '<td class="total-col" style="font-weight:800;border:1.5px solid #0f172a;">99</td>'
+        '<td class="total-col" style="font-weight:800;border:1.5px solid #0f172a;">5</td>'
+        '<td class="total-col" style="font-weight:800;border:1.5px solid #0f172a;">66</td>'
+        '<td class="total-col" style="font-weight:800;border:1.5px solid #0f172a;">41</td>'
+        '<td class="total-col" style="font-weight:800;border:1.5px solid #0f172a;">26</td>'
+        '<td class="total-col" style="font-weight:800;border:1.5px solid #0f172a;">9</td>'
+        '<td colspan="2" style="background-color:#e2e8f0;border:1.5px solid #0f172a;"></td>'
+        "</tr>"
+    )
+
+    return (
+        f'<div class="mp-sheet-container" style="max-width:980px;margin-bottom:1rem;">'
+        f'<table class="mp-sheet-table" style="font-size:0.84rem;">'
+        f'<tbody>{"".join(trs)}</tbody>'
+        f"</table>"
+        f"</div>"
+    )
+
+
 # Session state navigation
 if "current_view" not in st.session_state:
     st.session_state.current_view = "directory"
@@ -1106,9 +1230,19 @@ else:
         is_renaissance = "renaissance" in industry["name"].lower()
         is_adury = "adury" in industry["name"].lower()
         is_tosrifa = "tosrifa" in industry["name"].lower()
+        is_sm = "s.m." in industry["name"].lower()
         fakir_data = db.get_fakir_knitting_data() if is_fakir else None
 
-        if is_tosrifa:
+        if is_sm:
+            mk1, mk2, mk3, mk4 = st.columns(4)
+            mk1.metric("Total Machine Sets", "99")
+            mk2.metric("Total Cylinders (28G–14G)", "147 (28G:5 | 24G:66 | 20G:41 | 18G:26 | 14G:9)")
+            mk3.metric("Machine Categories", "7 (S/J, Open, Fleece, Striper, Rib, I/L)")
+            mk4.metric("Machine Brands", "5 (Jiunn Long, Lisky, Fukuhara, Pai Lung, Goanglih)")
+
+            st.markdown(render_sm_profile_html(), unsafe_allow_html=True)
+
+        elif is_tosrifa:
             mk1, mk2, mk3, mk4 = st.columns(4)
             mk1.metric("Grand Total Machines", "69")
             mk2.metric("Circular Knitting Machines", "45 (10,480 kg/day)")

@@ -214,6 +214,9 @@ def init_db():
     # Seed Tosrifa Industries Ltd machine profile if empty
     seed_tosrifa_machines(conn)
 
+    # Seed S.M. Group (S.M. Knitwears) machine profile if empty
+    seed_sm_machines(conn)
+
     conn.close()
 
 
@@ -890,6 +893,40 @@ def seed_tosrifa_machines(conn):
         ("Flat Bed Knitting Machine", 60, 14, "40\"–80\" Bed", "Shima Seiki / Matsuya", 24),
     ]
     for fab, dia, gauge, lbl, brand, qty in tosrifa_rows:
+        cur.execute(
+            """
+            INSERT INTO machine_profiles (
+                industry_id, fabrication, dia, gauge, dia_gauge_label, brand, quantity,
+                needles_per_machine, sinkers_per_machine
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+            """,
+            (ind_id, fab, dia, gauge, lbl, brand, qty),
+        )
+    conn.commit()
+
+
+def seed_sm_machines(conn):
+    """Seed S.M. Group (S.M. Knitwears) 99 knitting machines into machine_profiles."""
+    cur = conn.cursor()
+    row = cur.execute("SELECT id FROM industries WHERE name LIKE '%S.M.%' LIMIT 1").fetchone()
+    if not row:
+        return
+    ind_id = row["id"]
+
+    cnt = cur.execute("SELECT COUNT(*) as c FROM machine_profiles WHERE industry_id = ?", (ind_id,)).fetchone()["c"]
+    if cnt > 0:
+        return
+
+    sm_rows = [
+        ("S/J", 28, 24, "25\"–38\" x 24G", "Jiunn Long / Lisky", 7),
+        ("S/J Open with", 34, 24, "28\"–40\" x 24G/28G", "Fukuhara / Lisky", 19),
+        ("S/J & Fleece", 34, 24, "26\"–38\" x 24G/20G/14G", "Jiunn Long / Lisky / Goanglih", 40),
+        ("Auto Striper", 34, 24, "32\"–36\" x 24G", "Pai Lung", 4),
+        ("Fleece", 35, 20, "34\"–36\" x 20G", "Lisky", 3),
+        ("Rib", 40, 18, "32\"–44\" x 18G", "Jiunn Long / Fukuhara / Pai Lung", 14),
+        ("Rib/Interlock", 35, 18, "32\"–38\" x 18G/24G", "Fukuhara / Lisky / Pai Lung", 12),
+    ]
+    for fab, dia, gauge, lbl, brand, qty in sm_rows:
         cur.execute(
             """
             INSERT INTO machine_profiles (
