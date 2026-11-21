@@ -529,9 +529,10 @@ def _parse_fakir_unit_blocks(ws):
 
 
 def get_fakir_knitting_data():
-    """Parse Fakir Knitwears Ltd Knitting Section.xlsx (Sheet1 = Unit 1, Sheet2 = Unit 2)."""
+    """Return Fakir Knitwears Ltd. Unit-1, Unit-2, and Overall Summary data (from Excel if present, else saved data)."""
     if not os.path.exists(FAKIR_EXCEL_PATH):
-        return None
+        from fakir_data import FAKIR_SAVED_DATA
+        return FAKIR_SAVED_DATA
     wb = openpyxl.load_workbook(FAKIR_EXCEL_PATH, data_only=True)
     u1_blocks = _parse_fakir_unit_blocks(wb["Sheet1"]) if "Sheet1" in wb.sheetnames else []
     u2_blocks = _parse_fakir_unit_blocks(wb["Sheet2"]) if "Sheet2" in wb.sheetnames else []
@@ -673,8 +674,6 @@ def get_fakir_knitting_data():
 
 def seed_fakir_machines(conn):
     """Seed Fakir Knitwears Ltd. consolidated machine rows into machine_profiles so total counts appear across the CRM."""
-    if not os.path.exists(FAKIR_EXCEL_PATH):
-        return
     cur = conn.cursor()
     row = cur.execute("SELECT id FROM industries WHERE name LIKE '%Fakir Knitwear%' LIMIT 1").fetchone()
     if not row:
