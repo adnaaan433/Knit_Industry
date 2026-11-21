@@ -37,13 +37,7 @@ footer {
 }
 
 /* Soft floating blurred yarn circles */
-.yarn-orb-wrap {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-}
+.yarn-orb-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 .yarn-orb {
     position: absolute;
     border-radius: 50%;
@@ -51,19 +45,8 @@ footer {
     filter: blur(56px);
     animation: orbFloat 12s ease-in-out infinite alternate;
 }
-.yarn-orb-1 {
-    width: 240px;
-    height: 240px;
-    top: 12%;
-    left: calc(50% - 260px);
-}
-.yarn-orb-2 {
-    width: 210px;
-    height: 210px;
-    bottom: 14%;
-    right: calc(50% - 250px);
-    animation-delay: -5s;
-}
+.yarn-orb-1 { width: 240px; height: 240px; top: 12%; left: calc(50% - 260px); }
+.yarn-orb-2 { width: 210px; height: 210px; bottom: 14%; right: calc(50% - 250px); animation-delay: -5s; }
 
 @keyframes orbFloat {
     0% { transform: translate(0, 0) scale(1); }
@@ -118,78 +101,28 @@ div[data-testid="stForm"] {
 }
 
 /* Brand Header Block */
-.login-brand-block {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    margin-bottom: 1.25rem;
-    animation: cardEnter 0.32s ease-out both;
-}
-.needle-mark-svg {
-    width: 54px;
-    height: 54px;
-    margin: 0 auto 0.5rem auto;
-    display: block;
-}
-.yarn-loop-path {
-    transform-origin: 27px 27px;
-    animation: yarnSway 3.8s ease-in-out infinite alternate;
-}
+.login-brand-block { position: relative; z-index: 1; text-align: center; margin-bottom: 1.25rem; animation: cardEnter 0.32s ease-out both; }
+.needle-mark-svg { width: 54px; height: 54px; margin: 0 auto 0.5rem auto; display: block; }
+.yarn-loop-path { transform-origin: 27px 27px; animation: yarnSway 3.8s ease-in-out infinite alternate; }
 @keyframes yarnSway {
     0% { transform: rotate(-5deg) translateY(0); }
     100% { transform: rotate(5deg) translateY(1.5px); }
 }
-.login-app-title {
-    font-size: 1.45rem;
-    font-weight: 600;
-    margin: 0;
-    letter-spacing: -0.3px;
-}
-.login-tagline {
-    font-size: 0.86rem;
-    opacity: 0.72;
-    margin: 0.25rem 0 0 0;
-}
-.login-greeting {
-    font-size: 0.96rem;
-    font-weight: 600;
-    margin-bottom: 0.35rem;
-}
+.login-app-title { font-size: 1.45rem; font-weight: 600; margin: 0; letter-spacing: -0.3px; }
+.login-tagline { font-size: 0.86rem; opacity: 0.72; margin: 0.25rem 0 0 0; }
+.login-greeting { font-size: 0.96rem; font-weight: 600; margin-bottom: 0.35rem; }
 
-/* Accessible Focus & Alert */
-div[data-testid="stForm"] input:focus-visible {
-    outline: 2px solid #2563eb !important;
-    outline-offset: 2px !important;
-}
+div[data-testid="stForm"] input:focus-visible { outline: 2px solid #2563eb !important; outline-offset: 2px !important; }
 .login-alert {
-    margin-top: 0.65rem;
-    padding: 0.55rem 0.75rem;
-    border-radius: 8px;
-    font-size: 0.84rem;
-    font-weight: 600;
-    background: rgba(220, 38, 38, 0.14);
-    color: #ef4444;
-    border: 1px solid rgba(220, 38, 38, 0.35);
+    margin-top: 0.65rem; padding: 0.55rem 0.75rem; border-radius: 8px;
+    font-size: 0.84rem; font-weight: 600;
+    background: rgba(220, 38, 38, 0.14); color: #ef4444; border: 1px solid rgba(220, 38, 38, 0.35);
 }
-.login-fact-footer {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    font-size: 0.78rem;
-    opacity: 0.68;
-    margin-top: 1.15rem;
-    line-height: 1.45;
-    padding: 0 0.5rem;
-}
+.login-fact-footer { position: relative; z-index: 1; text-align: center; font-size: 0.78rem; opacity: 0.68; margin-top: 1.15rem; line-height: 1.45; }
 
 @media (prefers-reduced-motion: reduce) {
-    [data-testid="stAppViewContainer"],
-    .yarn-orb,
-    div[data-testid="stForm"],
-    .login-shake div[data-testid="stForm"],
-    .login-success-card,
-    .login-brand-block,
-    .yarn-loop-path {
+    [data-testid="stAppViewContainer"], .yarn-orb, div[data-testid="stForm"],
+    .login-shake div[data-testid="stForm"], .login-success-card, .login-brand-block, .yarn-loop-path {
         animation: none !important;
     }
 }
