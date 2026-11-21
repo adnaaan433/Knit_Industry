@@ -377,6 +377,24 @@ def sync_from_excel(conn=None, excel_path=None):
                         (ind_id, person, designation, phone, batch, c_status),
                     )
 
+    # Apply supplemental location details for factories not present in Factory Locations sheet
+    supplemental_locations = [
+        ("MASCO (Concept Knitting)", "Gazipura Shataish, Tongi", "Gazipur", 28.5, "https://maps.app.goo.gl/6w1qdQMLbkvDyKGt5"),
+        ("Renaissance Apparels Ltd.", "Rajendrapur", "Gazipur", 50.2, "https://maps.app.goo.gl/rBiJZQdX3EPDzoaF7"),
+    ]
+    for s_name, s_loc, s_cluster, s_dist, s_map in supplemental_locations:
+        cur.execute(
+            """
+            UPDATE industries
+            SET location_area = COALESCE(NULLIF(location_area, ''), ?),
+                cluster = COALESCE(NULLIF(cluster, ''), ?),
+                distance_km = COALESCE(distance_km, ?),
+                map_url = COALESCE(NULLIF(map_url, ''), ?)
+            WHERE name = ?
+            """,
+            (s_loc, s_cluster, s_dist, s_map, s_name),
+        )
+
     conn.commit()
     if close_conn:
         conn.close()
