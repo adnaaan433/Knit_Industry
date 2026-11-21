@@ -416,7 +416,11 @@ with st.sidebar:
                     except Exception as e:
                         st.error(f"Could not create industry: {e}")
 
-    with st.expander("💾 Backup / Restore Database", expanded=False):
+    with st.expander("💾 Sync Excel & Backup Database", expanded=False):
+        if st.button("🔄 Sync from Excel File Now", use_container_width=True):
+            db.sync_from_excel()
+            st.success("Synced latest data from Knit Industry Contacts.xlsx!")
+            st.rerun()
         st.caption("Download a backup of your CRM database (`crm_data.db`) or restore from a saved `.db` file.")
         if os.path.exists(db.DB_PATH):
             with open(db.DB_PATH, "rb") as f_db:

@@ -13,6 +13,8 @@ NAME_MAPPING = {
     "Nur Group": "Nur Group (Raiyan Knit Composite)",
     "Esquire Knit Composite Ltd.": "L'Esquire Ltd.",
     "Alliance Knit Composit": "Alliance Knit Composite Ltd.",
+    "S.M. Knitwears": "S.M. Group",
+    "Tosrifa Industries Ltd.": "Tosrifa Industries Ltd",
 }
 
 FABRICATION_TYPES = [
@@ -189,10 +191,9 @@ def init_db():
 
     conn.commit()
 
-    # Seed from Excel if industries table is empty
-    cur.execute("SELECT COUNT(*) as cnt FROM industries")
-    if cur.fetchone()["cnt"] == 0 and os.path.exists(EXCEL_PATH):
-        seed_from_excel(conn)
+    # Automatically sync any new/updated rows from Excel on startup
+    if os.path.exists(EXCEL_PATH):
+        sync_from_excel(conn)
 
     # Seed L'Esquire Knit Composite Ltd. machine profile from example image if empty
     seed_lesquire_machines(conn)
@@ -223,20 +224,39 @@ def _extract_hyperlink(cell_val):
     return ""
 
 
-def seed_from_excel(conn):
-    wb_val = openpyxl.load_workbook(EXCEL_PATH, data_only=True)
-    wb_formula = openpyxl.load_workbook(EXCEL_PATH, data_only=False)
+STATUS_RANK = {"New": 0, "Contacted": 1, "Scheduled": 2, "Visited": 3, "Follow-up": 4, "Active Client": 5}
+
+
+def sync_from_excel(conn=None, excel_path=None):
+    """Idempotently sync factories and contacts from Knit Industry Contacts.xlsx into SQLite."""
+    close_conn = False
+    if conn is None:
+        conn = get_connection()
+        close_conn = True
+
+    target_excel = excel_path or EXCEL_PATH
+    if not os.path.exists(target_excel):
+        if close_conn:
+            conn.close()
+        return
+
+    wb_val = openpyxl.load_workbook(target_excel, data_only=True)
+    wb_formula = openpyxl.load_workbook(target_excel, data_only=False)
 
     cur = conn.cursor()
-    industry_ids = {}
+    industry_ids = {
+        r["name"]: r["id"]
+        for r in cur.execute("SELECT id, name FROM industries").fetchall()
+    }
 
     if "Factory Locations" in wb_val.sheetnames:
         ws_val = wb_val["Factory Locations"]
         ws_form = wb_formula["Factory Locations"]
         for row_idx in range(2, ws_val.max_row + 1):
-            name = _clean_val(ws_val.cell(row_idx, 2).value)
-            if not name:
+            raw_name = _clean_val(ws_val.cell(row_idx, 2).value)
+            if not raw_name:
                 continue
+            name = NAME_MAPPING.get(raw_name, raw_name)
             loc_area = _clean_val(ws_val.cell(row_idx, 3).value)
             cluster = _clean_val(ws_val.cell(row_idx, 4).value)
             dist_raw = ws_val.cell(row_idx, 5).value
@@ -254,15 +274,33 @@ def seed_from_excel(conn):
 
             status = _clean_val(ws_val.cell(row_idx, 7).value) or "New"
 
-            cur.execute(
-                """
-                INSERT OR IGNORE INTO industries (name, location_area, cluster, distance_km, map_url, status)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (name, loc_area, cluster, dist_km, map_url, status),
-            )
-            cur.execute("SELECT id FROM industries WHERE name = ?", (name,))
-            industry_ids[name] = cur.fetchone()["id"]
+            if name not in industry_ids:
+                cur.execute(
+                    """
+                    INSERT INTO industries (name, location_area, cluster, distance_km, map_url, status)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (name, loc_area, cluster, dist_km, map_url, status),
+                )
+                industry_ids[name] = cur.lastrowid
+            else:
+                ind_id = industry_ids[name]
+                existing = cur.execute("SELECT * FROM industries WHERE id = ?", (ind_id,)).fetchone()
+                new_st = existing["status"]
+                if STATUS_RANK.get(status, 0) > STATUS_RANK.get(new_st, 0):
+                    new_st = status
+                cur.execute(
+                    """
+                    UPDATE industries
+                    SET location_area = COALESCE(NULLIF(?, ''), location_area),
+                        cluster = COALESCE(NULLIF(?, ''), cluster),
+                        distance_km = COALESCE(?, distance_km),
+                        map_url = COALESCE(NULLIF(?, ''), map_url),
+                        status = ?
+                    WHERE id = ?
+                    """,
+                    (loc_area, cluster, dist_km, map_url, new_st, ind_id),
+                )
 
     if "Contacts" in wb_val.sheetnames:
         ws_c = wb_val["Contacts"]
@@ -280,30 +318,61 @@ def seed_from_excel(conn):
 
             if factory_name not in industry_ids:
                 cur.execute(
-                    "INSERT OR IGNORE INTO industries (name, status) VALUES (?, ?)",
+                    "INSERT INTO industries (name, status) VALUES (?, ?)",
                     (factory_name, c_status),
                 )
-                cur.execute("SELECT id FROM industries WHERE name = ?", (factory_name,))
-                industry_ids[factory_name] = cur.fetchone()["id"]
+                industry_ids[factory_name] = cur.lastrowid
 
             ind_id = industry_ids[factory_name]
 
-            if c_status in ("Visited", "Contacted"):
-                cur.execute("SELECT status FROM industries WHERE id = ?", (ind_id,))
-                curr_st = cur.fetchone()["status"]
-                if curr_st == "New" or (curr_st == "Contacted" and c_status == "Visited"):
-                    cur.execute("UPDATE industries SET status = ? WHERE id = ?", (c_status, ind_id))
+            # Upgrade industry status if contact status is higher
+            curr_st = cur.execute("SELECT status FROM industries WHERE id = ?", (ind_id,)).fetchone()["status"]
+            if STATUS_RANK.get(c_status, 0) > STATUS_RANK.get(curr_st, 0):
+                cur.execute("UPDATE industries SET status = ? WHERE id = ?", (c_status, ind_id))
 
             if person:
-                cur.execute(
-                    """
-                    INSERT INTO contacts (industry_id, name, designation, phone, butex_batch, status)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    """,
-                    (ind_id, person, designation, phone, batch, c_status),
-                )
+                existing_contacts = cur.execute(
+                    "SELECT * FROM contacts WHERE industry_id = ?",
+                    (ind_id,),
+                ).fetchall()
+
+                matched_id = None
+                for ec in existing_contacts:
+                    ec_phone = (ec["phone"] or "").strip()
+                    ec_name = (ec["name"] or "").strip().lower()
+                    p_low = person.lower()
+                    if phone and ec_phone and phone == ec_phone:
+                        matched_id = ec["id"]
+                        break
+                    if ec_name == p_low or (not ec_phone and ec_name and ec_name in p_low):
+                        matched_id = ec["id"]
+                        break
+
+                if matched_id is not None:
+                    cur.execute(
+                        """
+                        UPDATE contacts
+                        SET name = ?,
+                            designation = COALESCE(NULLIF(?, ''), designation),
+                            phone = COALESCE(NULLIF(?, ''), phone),
+                            butex_batch = COALESCE(NULLIF(?, ''), butex_batch),
+                            status = ?
+                        WHERE id = ?
+                        """,
+                        (person, designation, phone, batch, c_status, matched_id),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        INSERT INTO contacts (industry_id, name, designation, phone, butex_batch, status)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """,
+                        (ind_id, person, designation, phone, batch, c_status),
+                    )
 
     conn.commit()
+    if close_conn:
+        conn.close()
 
 
 def seed_lesquire_machines(conn):
