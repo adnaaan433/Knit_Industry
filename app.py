@@ -666,9 +666,33 @@ else:
         st.subheader(f"⚙️ Machine Profile — {industry['name']}")
 
         is_fakir = "fakir knitwear" in industry["name"].lower()
+        is_masco = "masco" in industry["name"].lower()
         fakir_data = db.get_fakir_knitting_data() if is_fakir else None
 
-        if is_fakir and fakir_data:
+        if is_masco:
+            import masco_data
+
+            mk1, mk2, mk3, mk4 = st.columns(4)
+            mk1.metric("Grand Total Machines", "197")
+            mk2.metric("Unit-1 (Rupganj — Circular)", "121")
+            mk3.metric("Unit-2 (Tongi — Circular)", "48")
+            mk4.metric("Unit-2 (Tongi — Collar)", "28")
+
+            m_tab1, m_tab2 = st.tabs(
+                [
+                    "🏭 Knitting Unit-1 (Kendua, Kanchan, Rupganj — 121 Machines)",
+                    "🏭 Knitting Unit-2 (111/1, Darail, Shataish, Tongi — 48 Circular + 28 Collar)",
+                ]
+            )
+
+            with m_tab1:
+                st.markdown(masco_data.render_masco_unit1_html(), unsafe_allow_html=True)
+
+            with m_tab2:
+                st.markdown(masco_data.render_masco_unit2_circular_html(), unsafe_allow_html=True)
+                st.markdown(masco_data.render_masco_unit2_collar_html(), unsafe_allow_html=True)
+
+        elif is_fakir and fakir_data:
             mk1, mk2, mk3, mk4 = st.columns(4)
             mk1.metric("Grand Total Machines", "167 (165 Opt.)")
             mk2.metric("Knitting Unit-1", "109 (107 Opt.)")

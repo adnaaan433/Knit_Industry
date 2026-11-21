@@ -202,6 +202,9 @@ def init_db():
     # Seed Fakir Knitwears Ltd. machine profile from Fakir Knitwears Ltd Knitting Section.xlsx if empty
     seed_fakir_machines(conn)
 
+    # Seed MASCO (Concept Knitting) machine profile if empty
+    seed_masco_machines(conn)
+
     conn.close()
 
 
@@ -720,6 +723,41 @@ def seed_fakir_machines(conn):
             ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
             """,
             (ind_id, mc_type, dia_num, gauge_num, label, brand, qty),
+        )
+    conn.commit()
+
+
+def seed_masco_machines(conn):
+    """Seed MASCO (Concept Knitting) machine counts into machine_profiles so total machines (197) appear across the CRM."""
+    cur = conn.cursor()
+    row = cur.execute("SELECT id FROM industries WHERE name LIKE '%MASCO%' LIMIT 1").fetchone()
+    if not row:
+        return
+    ind_id = row["id"]
+
+    cnt = cur.execute("SELECT COUNT(*) as c FROM machine_profiles WHERE industry_id = ?", (ind_id,)).fetchone()["c"]
+    if cnt > 0:
+        return
+
+    masco_summary_rows = [
+        ("Unit-1 Double Jersey", 36, 18, "34\"–40\"", "FUKUHARA", 23),
+        ("Unit-1 Single Jersey", 34, 24, "30\"–42\"", "FUKUHARA / KEUM YUNG / LISKY / SANTONI", 98),
+        ("Unit-2 Double Jersey", 36, 18, "34\"–40\"", "FUKUHARA / KEUM YUNG", 9),
+        ("Unit-2 Single Jersey", 32, 24, "23\"–36\"", "PAI LUNG / FUKUHARA / SANTONI / LISKY / SAN DA", 21),
+        ("Unit-2 Eng. Stripe D/J", 35, 24, "34\"–36\"", "FUKUHARA", 2),
+        ("Unit-2 Eng. Stripe S/J", 32, 24, "30\"–36\"", "PAI LUNG / FUKUHARA", 8),
+        ("Unit-2 Jacquard & Pointal", 32, 18, "30\"–34\"", "HANG XING", 8),
+        ("Unit-2 Collar (Flat Knit)", 0, 14, "40\"–80\" Bed", "MATSUYA / KAUO HENG", 28),
+    ]
+    for fab, dia, gauge, lbl, brand, qty in masco_summary_rows:
+        cur.execute(
+            """
+            INSERT INTO machine_profiles (
+                industry_id, fabrication, dia, gauge, dia_gauge_label, brand, quantity,
+                needles_per_machine, sinkers_per_machine
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+            """,
+            (ind_id, fab, dia, gauge, lbl, brand, qty),
         )
     conn.commit()
 
